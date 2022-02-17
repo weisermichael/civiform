@@ -45,13 +45,38 @@ data "http" "myip" {
 # there might be a type of account we can create to run the tf command through
 # instead of doing this ip_rules bypass
 resource "azurerm_storage_account_network_rules" "files_storage_rules" {
-  storage_account_id         = azurerm_storage_account.files_storage_account.id
-  default_action             = "Deny"
-  virtual_network_subnet_ids = [azurerm_subnet.storage_subnet.id]
-  bypass                     = ["AzureServices"]
-  ip_rules                   = [chomp(data.http.myip.body)]
-  private_link_access {
-    endpoint_resource_id = azurerm_app_service.civiform_app.id
+  storage_account_id = azurerm_storage_account.files_storage_account.id
+  default_action     = "Deny"
+  bypass             = ["AzureServices"]
+  ip_rules           = [chomp(data.http.myip.body)]
+}
+
+resource "azurerm_private_dns_zone" "storage_dns_zone" {
+  name                = "privatelink.blob.core.windows.net"
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "storage_network_link" {
+  name                  = "storage_vnet_link"
+  resource_group_name   = azurerm_resource_group.rg.name
+  private_dns_zone_name = azurerm_private_dns_zone.storage_dns_zone.name
+  virtual_network_id    = azurerm_virtual_network.civiform_vnet.id
+}
+resource "azurerm_private_endpoint" "storage_endpoint" {
+  name                = "storage_endpoint"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  subnet_id           = azurerm_subnet.storage_subnet.id
+
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.storage_dns_zone.id]
+  }
+  private_service_connection {
+    name                           = "appservice-privateservicesconnection"
+    is_manual_connection           = false
+    private_connection_resource_id = azurerm_storage_account.files_storage_account.id
+    subresource_names              = ["Blob"]
   }
 }
 
