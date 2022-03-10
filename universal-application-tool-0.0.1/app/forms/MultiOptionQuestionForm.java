@@ -182,7 +182,7 @@ public abstract class MultiOptionQuestionForm extends QuestionForm {
     // Sets the next available ID as the previous ID + the size of new options, since each new
     // option ID is assigned in order.
     setNextAvailableId(nextAvailableId.getAsLong() + newOptions.size());
-
+    
     return super.getBuilder()
         .setQuestionOptions(questionOptions)
         .setValidationPredicates(predicateBuilder.build());
