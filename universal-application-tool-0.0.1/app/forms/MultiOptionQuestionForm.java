@@ -158,7 +158,6 @@ public abstract class MultiOptionQuestionForm extends QuestionForm {
           QuestionOption.create(
               optionIds.get(i), i, LocalizedStrings.withDefaultValue(options.get(i))));
     }
-
     // The IDs are not guaranteed to be in any type of order, so doing this ensures that we find
     // the largest ID in the list and accurately set the next largest.
     Long maxId = optionIds.stream().max(Long::compareTo).orElse(-1L);
