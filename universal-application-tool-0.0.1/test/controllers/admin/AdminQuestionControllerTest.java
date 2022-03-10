@@ -350,7 +350,7 @@ public class AdminQuestionControllerTest extends ResetPostgres {
     assertThat(questionForm.getNextAvailableId()).isPresent();
     assertThat(questionForm.getNextAvailableId().getAsLong()).isEqualTo(5L);
   }
-
+  
   @Test
   public void update_failsWithErrorMessageAndPopulatedFields() {
     Question question = testQuestionBank.applicantFavoriteColor();
