@@ -4,8 +4,42 @@ app. We intentionally don't use a shared state with this terraform directory
 to allow for everyone to have their own app. 
 
 The process to deploy is similar
-to the staging process but we do not have to do the shared state set up. It 
-should be `terraform init` and then `terraform apply`
+to the staging process but run from the cloud/deploys/dev_azure folder. 
+
+# Running the dev deploy
+## Copy the civiform_config.example.sh 
+Copy the civiform_config.example.sh into civiform_config.sh and
+ change the required variables. 
+
+## Setup Login Radius For Local Development
+Go to [Login Radius Dashboard](https://dashboard.loginradius.com/) and click
+configure a civiform integration. Choose the outbound SSO Saml.
+
+From there add an app with Sp initiated login and pick a name (this gets put
+into the config as `LOGIN_RADIUS_SAML_APP_NAME`).
+
+To generate the private key for the form run, cat the file and put into dashboard.
+```
+openssl genrsa -out private.key 2048
+```
+
+For generating the cert run, cat the file and put into dashboard.
+```
+openssl req -new -x509 -key private.key -out certificate.cert -days 365 -subj /CN=civiform-staging.hub.loginradius.com
+```
+
+We need to copy the details from a previous working setup in login radius 
+once we set up the certs so look back at the staging one to fill out.
+
+## Source and run 
+After that you can start the setup by running:
+
+```
+source cloud/deploys/dev_azure/civiform_config.sh
+cloud/shared/bin/setup  
+```
+
+You will need to complete the setup process as if onboarding a new civic entity.
 
 # Local Docker Build to Remote Azure Deploy
 If you want to do local onto terraform we build/tag/deploy the docker image 
@@ -24,15 +58,8 @@ docker push <DOCKER_USERNAME>/<DOCKER_REPO_NAME>:<IMAGE_TAG>
 You can do this one of two ways. Terraform deploy or update via the azure 
 portal 
 
-### Update via the .tfvars File and deploy
-After that you can change your .tfvars file to point to the docker tag you set
-
-```
-docker_repository_name = <DOCKER_REPO_NAME>
-docker_username        = <DOCKER_USERNAME>
-```
-
-deploy via `terraform apply`
+### Update via the deploy script
+TODO: Document this?
 
 ### Update via the azure portal
 Within the app service resource, you can select Deployment Center, and within

@@ -26,6 +26,8 @@ class Setup:
         self._setup_keyvault()
         self._setup_saml_keystore()
         self._setup_ses()    
+        if self.config.use_backend_config(): 
+            self._make_backend_override()
     
     def setup_log_file(self):
         self._setup_resource_group()
@@ -91,6 +93,14 @@ class Setup:
             "-c", "ssh-keygen -q -t rsa -b 4096 -N '' -f $HOME/.ssh/bastion <<< y"
         ], check=True)
     
+    def _make_backend_override(self):
+        current_directory = self.config.get_template_dir()
+        subprocess.run(["/bin/bash", 
+            "cp", 
+            f'${current_directory}/backend_override', 
+            f'${current_directory}/backend_override.tf'
+        ], check=True)
+        
     def _setup_shared_state(self):
         if not self.resource_group: 
             raise RuntimeError("Resource group required")
