@@ -3,9 +3,6 @@ This is a deploy directory that allows individuals to create a deploy of the
 app. We intentionally don't use a shared state with this terraform directory
 to allow for everyone to have their own app. 
 
-The process to deploy is similar
-to the staging process but run from the cloud/deploys/dev_azure folder. 
-
 # Running the dev deploy
 ## Copy the civiform_config.example.sh 
 Copy the civiform_config.example.sh into civiform_config.sh and
