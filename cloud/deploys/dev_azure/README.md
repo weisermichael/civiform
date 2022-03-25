@@ -31,15 +31,12 @@ openssl req -new -x509 -key private.key -out certificate.cert -days 365 -subj /C
 We need to copy the details from a previous working setup in login radius 
 once we set up the certs so look back at the staging one to fill out.
 
-## Source and run 
-After that you can start the setup by running:
+## Run
+After that you can start the setup by running and following the instructions:
 
 ```
-source cloud/deploys/dev_azure/civiform_config.sh
-cloud/shared/bin/setup  
+cloud/deploys/dev_azure/bin/setup  
 ```
-
-You will need to complete the setup process as if onboarding a new civic entity.
 
 # Local Docker Build to Remote Azure Deploy
 If you want to do local onto terraform we build/tag/deploy the docker image 
@@ -55,13 +52,7 @@ docker push <DOCKER_USERNAME>/<DOCKER_REPO_NAME>:<IMAGE_TAG>
 ```
 
 ## 2. Update the image name/tag for your remote azure deploy
-You can do this one of two ways. Terraform deploy or update via the azure 
-portal 
 
-### Update via the deploy script
-TODO: Document this?
-
-### Update via the azure portal
 Within the app service resource, you can select Deployment Center, and within
 the registry settings change the 'Full Image Name and Tag' to be 
 `<DOCKER_USERNAME>/<DOCKER_REPO_NAME>:<IMAGE_TAG>`

@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 import tempfile
 
@@ -95,11 +96,7 @@ class Setup:
     
     def _make_backend_override(self):
         current_directory = self.config.get_template_dir()
-        subprocess.run(["/bin/bash", 
-            "cp", 
-            f'${current_directory}/backend_override', 
-            f'${current_directory}/backend_override.tf'
-        ], check=True)
+        shutil.copy2(f'{current_directory}/backend_override', f'{current_directory}/backend_override.tf')
         
     def _setup_shared_state(self):
         if not self.resource_group: 
