@@ -46,12 +46,13 @@ If you want to do local onto terraform we build/tag/deploy the docker image
 and then update the azure app service to point to the local image. 
 
 ## 1. Build, Tag and Push the Docker Image
-Run the following script which takes the image tag from your civiform_config.sh
-and builds, tags and pushes it up to docker hub. You will need a custom 
-docker hub in order to do this. Check with team on how to pay for docker hub pro.
+Run the following script which takes the IMAGE_TAG, DOCKER_REPOSITORY, 
+DOCKER_USERNAME from your civiform_config.sh and builds, tags and pushes 
+it up to docker hub. You will need a custom docker hub in order to do this. 
+Check with team on how to pay for docker hub pro.
 
 ```
-cloud/deploys/dev_azure/bin/docker-btp
+cloud/deploys/dev_azure/bin/docker-build-tag-push
 ```
 
 ## 2. Update the image name/tag for your remote azure deploy
