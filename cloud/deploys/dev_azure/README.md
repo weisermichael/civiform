@@ -8,6 +8,12 @@ to allow for everyone to have their own app.
 Copy the civiform_config.example.sh into civiform_config.sh and
  change the required variables. 
 
+## Get access to correct technologies
+You will need to reach out to team members to get accounts for the following:
+- Azure
+- AWS
+- Login Radius Civiform-Staging 
+
 ## Setup Login Radius For Local Development
 Go to [Login Radius Dashboard](https://dashboard.loginradius.com/) and click
 configure a civiform integration. Choose the outbound SSO Saml.
@@ -40,12 +46,12 @@ If you want to do local onto terraform we build/tag/deploy the docker image
 and then update the azure app service to point to the local image. 
 
 ## 1. Build, Tag and Push the Docker Image
-This should take like 30 minutes (the push takes the longest).
+Run the following script which takes the image tag from your civiform_config.sh
+and builds, tags and pushes it up to docker hub. You will need a custom 
+docker hub in order to do this. Check with team on how to pay for docker hub pro.
 
 ```
-docker build -f prod.Dockerfile -t <IMAGE_TAG> --cache-from docker.io/civiform/civiform-browser-test:latest --build-arg BUILDKIT_INLINE_CACHE=1 .
-docker tag <IMAGE_TAG> <DOCKER_USERNAME>/<DOCKER_REPO_NAME>:<IMAGE_TAG>
-docker push <DOCKER_USERNAME>/<DOCKER_REPO_NAME>:<IMAGE_TAG>
+cloud/deploys/dev_azure/bin/docker-btp
 ```
 
 ## 2. Update the image name/tag for your remote azure deploy
