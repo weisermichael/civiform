@@ -13,11 +13,9 @@ Config Loader
 """
 class ConfigLoader:
 
-    @property
     def tfvars_filename(self):
         return os.environ['TF_VAR_FILENAME']
     
-    @property
     def backend_vars_filename(self):
         return os.environ['BACKEND_VARS_FILENAME']
     
