@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/recommended/tsconfig.json",
+  "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
     "lib": ["es6", "es2017", "dom"],
     "paths": {

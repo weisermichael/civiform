@@ -31,9 +31,9 @@ sbt_cache/*
 /browser-test/sbt_cache/*
 !/browser-test/sbt_cache/.keep
 
-*/.classpath
-*/.vscode
-*/.project
+**/.classpath
+**/.vscode
+**/.project
 **/.data
 **/.metals/
 **/.bloop/

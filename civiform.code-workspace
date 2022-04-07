@@ -9,8 +9,25 @@
 	],
 	"settings": {
 		"files.watcherExclude": {
-			"**/target": true
-		},
+      "**/target": true
+    },
 		"java.configuration.updateBuildConfiguration": "automatic"
-	}
+  },
+  "extensions": {
+    "recommendations": [
+      "foxundermoon.shell-format",
+      "timonwong.shellcheck",
+      "ms-azuretools.vscode-docker",
+      "vscjava.vscode-java-pack",
+      "github.vscode-pull-request-github",
+      "wx-chevalier.google-java-format",
+      "hashicorp.terraform",
+      "ms-ossdata.vscode-postgresql",
+      "rvest.vs-code-prettier-eslint",
+      "scalameta.metals",
+      "scala-lang.scala",
+      "bradlc.vscode-tailwindcss",
+      "ms-python.python"
+    ]
+  }
 }
