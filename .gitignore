@@ -40,3 +40,5 @@ sbt_cache/*
 **/.ammonite/
 **/metals.sbt
 **/pom.xml
+
+universal-application-tool-0.0.1/package-lock.json
