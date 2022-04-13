@@ -9,6 +9,7 @@ readonly STORAGE_ACCOUNT_CONTRIBUTOR_GUID="17d1049b-9a84-46fb-8f53-869881c3d3ab"
 #   1. The resource group to scope the role assignment to
 #######################################
 function storage::assign_storage_blob_data_contributor_role_to_user() {
+  # adding a comment
   local SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
   azure::ensure_role_assignment \
     "${1}" \
