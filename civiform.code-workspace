@@ -1,16 +1,36 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"name": "universal-application-tool",
+			"path": "universal-application-tool-0.0.1"
 		},
 		{
-			"path": "universal-application-tool-0.0.1"
+			"name": "root",
+			"path": "."
 		}
 	],
 	"settings": {
+		"java.configuration.updateBuildConfiguration": "automatic",
 		"files.watcherExclude": {
 			"**/target": true
 		},
-		"java.configuration.updateBuildConfiguration": "automatic"
+	},
+	"extensions": {
+		"recommendations": [
+			"vscjava.vscode-java-pack",
+			"eamodio.gitlens",
+			"github.vscode-pull-request-github",
+			"knisterpeter.vscode-github",
+			"ms-azuretools.vscode-docker",
+			"hashicorp.terraform",
+			"ms-ossdata.vscode-postgresql",
+			"bradlc.vscode-tailwindcss",
+			"scala-lang.scala",
+			"redhat.vscode-yaml",
+			"scalameta.metals",
+			"wx-chevalier.google-java-format",
+			"ms-python.python",
+			"foxundermoon.shell-format"
+		]
 	}
 }
