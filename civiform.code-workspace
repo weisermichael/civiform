@@ -7,10 +7,76 @@
 			"path": "server"
 		}
 	],
-	"settings": {
-		"files.watcherExclude": {
-			"**/target": true
-		},
-		"java.configuration.updateBuildConfiguration": "automatic"
-	}
+  "settings": {
+    "files.watcherExclude": {
+      "**/target": true,
+      "**/.metals": true,
+      "**/.ammonite": true,
+      "**/.bloop": true,
+      "**/sbt_cache": true,
+    },
+    "search.exclude": {
+      "**/target": true,
+      "**/.metals": true,
+      "**/.ammonite": true,
+      "**/.bloop": true,
+      "**/sbt_cache": true,
+    },
+    // Setup default styleguide
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "modifications", // but only format modified lines
+    "editor.detectIndentation": false,
+    "editor.tabSize": 2,
+    "[dockerfile]": {
+      "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+    },
+    "[java]": {
+      "editor.defaultFormatter": "redhat.java"
+    },
+    "[yaml]": {
+      "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "[jsonc]": {
+      "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[scala]": {
+      "editor.defaultFormatter": "scalameta.metals"
+    },
+    "[shellscript]": {
+      "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "editor.rulers": [
+      80
+    ],
+    "html.format.wrapLineLength": 100,
+    "shellformat.flag": "-bn -ci -kp -i 2",
+    "yaml.customTags": [
+      "!Equals sequence",
+      "!FindInMap sequence",
+      "!GetAtt",
+      "!GetAZs",
+      "!ImportValue",
+      "!Join sequence",
+      "!Ref",
+      "!Select sequence",
+      "!Split sequence",
+      "!Sub"
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "vscjava.vscode-java-pack",
+      "eamodio.gitlens",
+      "github.vscode-pull-request-github",
+      "knisterpeter.vscode-github",
+      "ms-azuretools.vscode-docker",
+      "hashicorp.terraform",
+      "ms-ossdata.vscode-postgresql",
+      "bradlc.vscode-tailwindcss",
+      "scala-lang.scala",
+      "redhat.vscode-yaml"
+    ]
+  }
+}
+
 }
