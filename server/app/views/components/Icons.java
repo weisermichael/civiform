@@ -10,6 +10,11 @@ public class Icons {
           + " 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z";
   public static final String ANNOTATION_SVG_PATH =
       "M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z";
+  public static final String ARROW_FORWARD_SVG_PATH =
+          "M24 40 21.9 37.85 34.25 25.5H8V22.5H34.25L21.9 10.15L24 8L40 24Z";
+  public static final String EDIT_SVG_PATH = "M9 39H11.2L35.45 14.75L34.35 13.65L33.25 12.55L9 36.8ZM6 42V35.6L35.4" +
+          "6.2Q36.25 5.35 37.525 5.375Q38.8 5.4 39.65 6.25L41.8 8.4Q42.65 9.25 42.65 10.5Q42.65 11.75 41.8 12.6L12.4" +
+          "42ZM39.5 10.45 37.45 8.4ZM35.45 14.75 34.35 13.65 33.25 12.55 35.45 14.75Z";
   // Check
   public static final String CHECKBOX_SVG_PATH = "M5 13l4 4L19 7";
   public static final String CURRENCY_SVG_PATH =

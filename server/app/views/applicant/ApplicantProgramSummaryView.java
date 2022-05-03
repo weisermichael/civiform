@@ -71,7 +71,6 @@ public final class ApplicantProgramSummaryView extends BaseHtmlView {
 
     ContainerTag applicationSummary = div().withId("application-summary").withClasses(Styles.MB_8);
     Optional<RepeatedEntity> previousRepeatedEntity = Optional.empty();
-    boolean isFirstUnanswered = true;
     for (AnswerData answerData : params.summaryData()) {
       Optional<RepeatedEntity> currentRepeatedEntity = answerData.repeatedEntity();
       if (!currentRepeatedEntity.equals(previousRepeatedEntity)
@@ -80,8 +79,7 @@ public final class ApplicantProgramSummaryView extends BaseHtmlView {
       }
       applicationSummary.with(
           renderQuestionSummary(
-              answerData, messages, params.applicantId(), params.inReview(), isFirstUnanswered));
-      isFirstUnanswered = isFirstUnanswered && answerData.isAnswered();
+              answerData, messages, params.applicantId(), params.inReview()));
       previousRepeatedEntity = currentRepeatedEntity;
     }
 
@@ -90,32 +88,21 @@ public final class ApplicantProgramSummaryView extends BaseHtmlView {
         routes.ApplicantProgramReviewController.submit(params.applicantId(), params.programId())
             .url();
 
-    Tag continueOrSubmitButton;
-    if (params.completedBlockCount() == params.totalBlockCount()) {
-      continueOrSubmitButton =
+    Tag submitButton =
           submitButton(messages.at(MessageKey.BUTTON_SUBMIT.getKeyName()))
               .withClasses(
                   ReferenceClasses.SUBMIT_BUTTON, ApplicantStyles.BUTTON_SUBMIT_APPLICATION);
-    } else {
-      String applyUrl =
-          routes.ApplicantProgramsController.edit(params.applicantId(), params.programId()).url();
-      continueOrSubmitButton =
-          a().attr(HREF, applyUrl)
-              .withText(messages.at(MessageKey.BUTTON_CONTINUE.getKeyName()))
-              .withId("continue-application-button")
-              .withClasses(
-                  ReferenceClasses.CONTINUE_BUTTON, ApplicantStyles.BUTTON_SUBMIT_APPLICATION);
-    }
 
     ContainerTag content =
         div()
             .with(applicationSummary)
             .with(
                 form()
+                    .withClasses(Styles.JUSTIFY_END)
                     .withAction(submitLink)
                     .withMethod(Http.HttpVerbs.POST)
                     .with(makeCsrfTokenInputTag(params.request()))
-                    .with(continueOrSubmitButton));
+                    .with(submitButton));
 
     if (!params.banner().isEmpty()) {
       bundle.addToastMessages(ToastMessage.error(params.banner()));
@@ -136,73 +123,68 @@ public final class ApplicantProgramSummaryView extends BaseHtmlView {
       AnswerData data,
       Messages messages,
       long applicantId,
-      boolean inReview,
-      boolean isFirstUnanswered) {
-    ContainerTag questionPrompt =
-        div(data.questionText()).withClasses(Styles.FLEX_AUTO, Styles.FONT_SEMIBOLD);
-    ContainerTag questionContent =
-        div(questionPrompt).withClasses(Styles.FLEX, Styles.FLEX_ROW, Styles.PR_2);
+      boolean inReview) {
+    ContainerTag questionDiv =
+            div(data.questionText()).withClasses(Styles.FONT_SEMIBOLD, Styles.PR_4, Styles.BASIS_1_4);
 
     // Show timestamp if answered elsewhere.
     if (data.isPreviousResponse()) {
+      // TODO(azizoval): TEST THIS
       LocalDate date =
-          Instant.ofEpochMilli(data.timestamp()).atZone(ZoneId.systemDefault()).toLocalDate();
+              Instant.ofEpochMilli(data.timestamp()).atZone(ZoneId.systemDefault()).toLocalDate();
       ContainerTag timestampContent =
-          div("Previously answered on " + date)
-              .withClasses(Styles.FLEX_AUTO, Styles.TEXT_RIGHT, Styles.FONT_LIGHT, Styles.TEXT_XS);
-      questionContent.with(timestampContent);
+              div(messages.at(MessageKey.TEXT_PREVIOSLY_ANSWERED.getKeyName(), date))
+                      .withClasses(Styles.FLEX_AUTO, Styles.TEXT_RIGHT, Styles.FONT_LIGHT, Styles.TEXT_XS);
+      questionDiv.with(timestampContent);
     }
 
-    final ContainerTag answerContent;
+    final ContainerTag answerDiv;
     if (data.fileKey().isPresent()) {
+      // TODO(azizoval): TEST THIS
       String encodedFileKey = URLEncoder.encode(data.fileKey().get(), StandardCharsets.UTF_8);
       String fileLink = controllers.routes.FileController.show(applicantId, encodedFileKey).url();
-      answerContent = a().withHref(fileLink).withClasses(Styles.W_2_3);
+      answerDiv = a().withHref(fileLink).withClasses(Styles.W_2_3);
     } else {
-      answerContent = div();
+      answerDiv = div();
     }
-    answerContent.withClasses(
-        Styles.FLEX_AUTO, Styles.TEXT_LEFT, Styles.FONT_LIGHT, Styles.TEXT_SM);
     // Add answer text, converting newlines to <br/> tags.
     String[] texts = data.answerText().split("\n");
     texts = Arrays.stream(texts).filter(text -> text.length() > 0).toArray(String[]::new);
-    for (int i = 0; i < texts.length; i++) {
-      if (i > 0) {
-        answerContent.with(br());
+    if (data.isAnswered()) {
+      answerDiv.withClasses(
+              Styles.FLEX_1, Styles.TEXT_LEFT, Styles.FONT_LIGHT, Styles.TEXT_SM);
+      for (int i = 0; i < texts.length; i++) {
+        if (i > 0) {
+          answerDiv.with(br());
+        }
+        answerDiv.withText(texts[i]);
       }
-      answerContent.withText(texts[i]);
+    } else {
+      answerDiv.withClasses(
+              Styles.FLEX_1, Styles.TEXT_LEFT, Styles.TEXT_RED_500, Styles.TEXT_SM);
+      answerDiv.withText(messages.at(MessageKey.TEXT_COMPLETE_THIS_QUESTION.getKeyName()));
     }
 
-    ContainerTag answerDiv =
-        div(answerContent).withClasses(Styles.FLEX, Styles.FLEX_ROW, Styles.PR_2);
-
-    // Maybe link to block containing specific question.
-    if (data.isAnswered() || isFirstUnanswered) {
-      String editText = messages.at(MessageKey.LINK_EDIT.getKeyName());
-      if (!data.isAnswered()) {
-        editText =
-            inReview
-                ? messages.at(MessageKey.BUTTON_CONTINUE.getKeyName())
-                : messages.at(MessageKey.LINK_BEGIN.getKeyName());
-      }
-      String editLink =
-          (!data.isAnswered() && !inReview)
-              ? routes.ApplicantProgramBlocksController.edit(
-                      applicantId, data.programId(), data.blockId())
-                  .url()
-              : routes.ApplicantProgramBlocksController.review(
-                      applicantId, data.programId(), data.blockId())
-                  .url();
+    String editText = data.isAnswered() ? messages.at(MessageKey.LINK_EDIT.getKeyName()) :
+            messages.at(MessageKey.LINK_ANSWER.getKeyName());
+    String editLink =
+        (!data.isAnswered() && !inReview)
+            ? routes.ApplicantProgramBlocksController.edit(
+                    applicantId, data.programId(), data.blockId())
+                .url()
+            : routes.ApplicantProgramBlocksController.review(
+                    applicantId, data.programId(), data.blockId())
+                .url();
 
       ContainerTag editAction =
           new LinkElement()
               .setHref(editLink)
               .setText(editText)
               .setStyles(
-                  Styles.ABSOLUTE,
                   Styles.BOTTOM_0,
                   Styles.RIGHT_0,
                   Styles.PR_2,
+                  Styles.CONTENT_CENTER,
                   Styles.TEXT_BLUE_600,
                   StyleUtils.hover(Styles.TEXT_BLUE_700))
               .asAnchorText()
@@ -212,25 +194,22 @@ public final class ApplicantProgramSummaryView extends BaseHtmlView {
       ContainerTag editContent =
           div(editAction)
               .withClasses(
-                  Styles.FLEX_AUTO,
                   Styles.TEXT_RIGHT,
                   Styles.FONT_MEDIUM,
-                  Styles.RELATIVE,
                   Styles.BREAK_NORMAL);
 
-      answerDiv.with(editContent);
-    }
-
-    return div(questionContent, answerDiv)
+    return div(questionDiv, answerDiv, editContent)
         .withClasses(
             ReferenceClasses.APPLICANT_SUMMARY_ROW,
             marginIndentClass(data.repeatedEntity().map(RepeatedEntity::depth).orElse(0)),
-            data.isAnswered() ? "" : Styles.BG_YELLOW_50,
             Styles.MY_0,
             Styles.P_2,
             Styles.PT_4,
             Styles.BORDER_B,
-            Styles.BORDER_GRAY_300)
+            Styles.BORDER_GRAY_300,
+            Styles.FLEX,
+            Styles.JUSTIFY_BETWEEN,
+            Styles.ITEMS_CENTER)
         .attr("style", "word-break:break-word");
   }
 
