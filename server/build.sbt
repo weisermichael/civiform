@@ -22,7 +22,7 @@ lazy val root = (project in file("."))
       "com.j2html" % "j2html" % "1.4.0",
 
       // Amazon AWS SDK
-      "software.amazon.awssdk" % "aws-sdk-java" % "2.17.180",
+      "software.amazon.awssdk" % "aws-sdk-java" % "2.17.183",
 
       // Microsoft Azure SDK
       "com.azure" % "azure-identity" % "1.5.0",
@@ -103,7 +103,7 @@ lazy val root = (project in file("."))
     incOptions := incOptions.value.withTransitiveStep(2),
 
     // Make verbose tests
-    Test / testOptions := Seq(Tests.Argument(TestFrameworks.JUnit, "-a", "-v")),
+    Test / testOptions := Seq(Tests.Argument(TestFrameworks.JUnit, "-a", "-v", "-q")),
     // Use test config for tests
     Test / javaOptions += "-Dconfig.file=conf/application.test.conf",
     // Turn off scaladoc link warnings
