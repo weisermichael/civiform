@@ -13,7 +13,6 @@ public final class Styles {
   public static final String SR_ONLY = "sr-only";
   public static final String NOT_SR_ONLY = "not-sr-only";
   public static final String APPEARANCE_NONE = "appearance-none";
-  public static final String BASIS_1_4 = "basis-1/4";
   public static final String BG_FIXED = "bg-fixed";
   public static final String BG_LOCAL = "bg-local";
   public static final String BG_SCROLL = "bg-scroll";

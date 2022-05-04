@@ -125,18 +125,8 @@ public final class ApplicantProgramSummaryView extends BaseHtmlView {
       long applicantId,
       boolean inReview) {
     ContainerTag questionDiv =
-            div(data.questionText()).withClasses(Styles.FONT_SEMIBOLD, Styles.PR_4, Styles.BASIS_1_4);
-
-    // Show timestamp if answered elsewhere.
-    if (data.isPreviousResponse()) {
-      // TODO(azizoval): TEST THIS
-      LocalDate date =
-              Instant.ofEpochMilli(data.timestamp()).atZone(ZoneId.systemDefault()).toLocalDate();
-      ContainerTag timestampContent =
-              div(messages.at(MessageKey.TEXT_PREVIOSLY_ANSWERED.getKeyName(), date))
-                      .withClasses(Styles.FLEX_AUTO, Styles.TEXT_RIGHT, Styles.FONT_LIGHT, Styles.TEXT_XS);
-      questionDiv.with(timestampContent);
-    }
+            div(data.questionText()).withClasses(Styles.FONT_SEMIBOLD, Styles.PR_4,
+                    StyleUtils.responsiveLarge(Styles.W_1_3));
 
     final ContainerTag answerDiv;
     if (data.fileKey().isPresent()) {
@@ -145,25 +135,38 @@ public final class ApplicantProgramSummaryView extends BaseHtmlView {
       String fileLink = controllers.routes.FileController.show(applicantId, encodedFileKey).url();
       answerDiv = a().withHref(fileLink).withClasses(Styles.W_2_3);
     } else {
-      answerDiv = div();
-    }
-    // Add answer text, converting newlines to <br/> tags.
-    String[] texts = data.answerText().split("\n");
-    texts = Arrays.stream(texts).filter(text -> text.length() > 0).toArray(String[]::new);
-    if (data.isAnswered()) {
-      answerDiv.withClasses(
-              Styles.FLEX_1, Styles.TEXT_LEFT, Styles.FONT_LIGHT, Styles.TEXT_SM);
-      for (int i = 0; i < texts.length; i++) {
-        if (i > 0) {
-          answerDiv.with(br());
+      answerDiv = div().withClasses(
+              Styles.FLEX_1, Styles.TEXT_LEFT,Styles.TEXT_SM);
+      // Add answer text, converting newlines to <br/> tags.
+      String[] texts = data.answerText().split("\n");
+      texts = Arrays.stream(texts).filter(text -> text.length() > 0).toArray(String[]::new);
+      if (data.isAnswered()) {
+        answerDiv.withClasses(Styles.FONT_LIGHT);
+        for (int i = 0; i < texts.length; i++) {
+          if (i > 0) {
+            answerDiv.with(br());
+          }
+          answerDiv.withText(texts[i]);
         }
-        answerDiv.withText(texts[i]);
+      } else {
+        answerDiv.withClasses(Styles.TEXT_RED_500);
+        answerDiv.withText(messages.at(MessageKey.TEXT_COMPLETE_THIS_QUESTION.getKeyName()));
       }
-    } else {
-      answerDiv.withClasses(
-              Styles.FLEX_1, Styles.TEXT_LEFT, Styles.TEXT_RED_500, Styles.TEXT_SM);
-      answerDiv.withText(messages.at(MessageKey.TEXT_COMPLETE_THIS_QUESTION.getKeyName()));
     }
+
+    // Show timestamp if answered elsewhere.
+    if (data.isPreviousResponse()) {
+      LocalDate date =
+              Instant.ofEpochMilli(data.timestamp()).atZone(ZoneId.systemDefault()).toLocalDate();
+      ContainerTag timestampContent =
+              div(messages.at(MessageKey.TEXT_PREVIOSLY_ANSWERED.getKeyName(), date))
+                      .withClasses(Styles.FLEX_AUTO, Styles.TEXT_RIGHT, Styles.FONT_LIGHT, Styles.TEXT_XS);
+      answerDiv.with(timestampContent);
+    }
+
+    ContainerTag questionContainer = div(questionDiv, answerDiv).withClasses(Styles.FLEX, Styles.FLEX_1,
+            Styles.FLEX_COL,
+            StyleUtils.responsiveLarge(Styles.FLEX_ROW), StyleUtils.responsiveLarge(Styles.ITEMS_CENTER));
 
     String editText = data.isAnswered() ? messages.at(MessageKey.LINK_EDIT.getKeyName()) :
             messages.at(MessageKey.LINK_ANSWER.getKeyName());
@@ -176,29 +179,29 @@ public final class ApplicantProgramSummaryView extends BaseHtmlView {
                     applicantId, data.programId(), data.blockId())
                 .url();
 
-      ContainerTag editAction =
-          new LinkElement()
-              .setHref(editLink)
-              .setText(editText)
-              .setStyles(
-                  Styles.BOTTOM_0,
-                  Styles.RIGHT_0,
-                  Styles.PR_2,
-                  Styles.CONTENT_CENTER,
-                  Styles.TEXT_BLUE_600,
-                  StyleUtils.hover(Styles.TEXT_BLUE_700))
-              .asAnchorText()
-              .attr(
-                  "aria-label",
-                  messages.at(MessageKey.ARIA_LABEL_EDIT.getKeyName(), data.questionText()));
-      ContainerTag editContent =
-          div(editAction)
-              .withClasses(
-                  Styles.TEXT_RIGHT,
-                  Styles.FONT_MEDIUM,
-                  Styles.BREAK_NORMAL);
+    String ariaLabel = data.isAnswered() ? messages.at(MessageKey.ARIA_LABEL_EDIT.getKeyName(), data.questionText())
+            : messages.at(MessageKey.ARIA_LABEL_ANSWER.getKeyName(), data.questionText());
+    ContainerTag editAction =
+        new LinkElement()
+            .setHref(editLink)
+            .setText(editText)
+            .setStyles(
+                Styles.BOTTOM_0,
+                Styles.RIGHT_0,
+                Styles.PR_2,
+                Styles.CONTENT_CENTER,
+                Styles.TEXT_BLUE_600,
+                StyleUtils.hover(Styles.TEXT_BLUE_700))
+            .asAnchorText()
+            .attr("aria-label", ariaLabel);
+    ContainerTag editContent =
+        div(editAction)
+            .withClasses(
+                Styles.TEXT_RIGHT,
+                Styles.FONT_MEDIUM,
+                Styles.BREAK_NORMAL);
 
-    return div(questionDiv, answerDiv, editContent)
+    return div(questionContainer, editContent)
         .withClasses(
             ReferenceClasses.APPLICANT_SUMMARY_ROW,
             marginIndentClass(data.repeatedEntity().map(RepeatedEntity::depth).orElse(0)),
@@ -208,7 +211,7 @@ public final class ApplicantProgramSummaryView extends BaseHtmlView {
             Styles.BORDER_B,
             Styles.BORDER_GRAY_300,
             Styles.FLEX,
-            Styles.JUSTIFY_BETWEEN,
+            Styles.FLEX_ROW,
             Styles.ITEMS_CENTER)
         .attr("style", "word-break:break-word");
   }
