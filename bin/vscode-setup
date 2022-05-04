@@ -17,35 +17,97 @@ bin/sbt makePom
 
 # Copy the generated target directory from the docker container to a local dir
 # so that we can use globs to copy the correct file out.
-docker cp civiform-shell:/usr/src/server/target server/temp
+${DOCKER_COMPOSE_DEV} cp civiform-shell:/usr/src/server/target server/temp
 
 cp server/temp/scala-*/*.pom \
   server/pom.xml
 
 rm -rf server/temp
 
-BUILD=$(
-         cat <<END
+readonly BUILD="$(
+    cat <<END
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <generatedSources>target/generated-sources/java</generatedSources>
     </properties>
     <build>
         <sourceDirectory>app</sourceDirectory>
         <testSourceDirectory>test</testSourceDirectory>
         <resources>
+           <resource>
+                <directory>conf</directory>
+           </resource>
+           <resource>
+                <directory>target/routes/main</directory>
+            </resource>
             <resource>
-            <directory>conf</directory>
+                <directory>target/scala-2.13/routes/main</directory>
+            </resource>
+            <resource>
+                <directory>target/generated-sources/java</directory>
             </resource>
         </resources>
         <testResources>
             <testResource>
-            <directory>test/conf</directory>
+                <directory>test/conf</directory>
             </testResource>
         </testResources>
+        <plugins>
+          <plugin>
+              <groupId>com.mysema.maven</groupId>
+              <artifactId>apt-maven-plugin</artifactId>
+              <version>1.1.3</version>
+              <executions>
+              <execution>
+                  <goals>
+                    <goal>process</goal>
+                  </goals>
+                  <configuration>
+                  <outputDirectory>target/generated-sources/java</outputDirectory>
+                  <processors>
+                      <processor>com.google.auto.value.processor.AutoValueProcessor</processor>
+                  </processors>
+                  </configuration>
+              </execution>
+              </executions>
+          </plugin>
+          <plugin>
+              <groupId>com.google.code.play2-maven-plugin</groupId>
+              <artifactId>play2-maven-plugin</artifactId>
+              <version>1.0.0-rc5</version>
+              <extensions>true</extensions>
+          </plugin>
+          <plugin>
+              <groupId>net.alchim31.maven</groupId>
+              <artifactId>scala-maven-plugin</artifactId>
+              <version>4.6.1</version>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>3.0.0</version>
+            <executions>
+              <execution>
+                <!-- Need to ensure the generated source folder is added to the project classpath, in jdt.ls -->
+                <id>add-source</id>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>add-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>target/generated-sources/java</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
     </build>
     <modelVersion>
 END
-)
-
+)"
 perl -i -pe "s|\s+<modelVersion>|${BUILD}|g" server/pom.xml
+
+perl -i -pe "s|<packaging>jar</packaging>|<packaging>play2</packaging>|g" server/pom.xml
