@@ -1,5 +1,6 @@
 #! /usr/bin/env bash
 
 source cloud/deploys/dev_azure/bin/lib.sh
+source cloud/deploys/dev_azure/civiform_config.sh
 
 cloud/shared/bin/deploy
