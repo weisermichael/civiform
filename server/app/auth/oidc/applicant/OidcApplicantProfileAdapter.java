@@ -19,7 +19,7 @@ import auth.CiviFormProfile;
 import auth.CiviFormProfileData;
 import auth.ProfileFactory;
 import auth.Roles;
-import auth.oidc.OidcCiviFormProfileAdapter;
+import auth.oidc.OidcProfileAdapter;
 import repository.UserRepository;
 
 /**
@@ -33,7 +33,7 @@ import repository.UserRepository;
  * different
  * implementations of the two abstract methods.
  */
-public abstract class OidcApplicantProfileAdapter extends OidcCiviFormProfileAdapter {
+public abstract class OidcApplicantProfileAdapter extends OidcProfileAdapter {
 
   private static final Logger logger = LoggerFactory.getLogger(OidcApplicantProfileAdapter.class);
   protected final Config app_configuration;
@@ -57,6 +57,17 @@ public abstract class OidcApplicantProfileAdapter extends OidcCiviFormProfileAda
    * Provide the prefix used in the application.conf
    */
   protected abstract String attributePrefix();
+
+  protected String getConfigurationValue(String attr) {
+    return getConfigurationValue(attr, "");
+  }
+
+  protected String getConfigurationValue(String attr, String defaultValue) {
+    if (app_configuration.hasPath(attr)) {
+      return app_configuration.getString(attr);
+    }
+    return defaultValue;
+  }
 
   protected String getEmailAttributeName() {
     return getConfigurationValue(attributePrefix() + "." + emailAttributeConfigName);

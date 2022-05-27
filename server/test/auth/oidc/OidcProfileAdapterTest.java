@@ -16,13 +16,13 @@ import org.pac4j.oidc.profile.OidcProfile;
 import repository.ResetPostgres;
 import repository.UserRepository;
 
-public class OidcCiviFormProfileAdapterTest extends ResetPostgres {
+public class OidcProfileAdapterTest extends ResetPostgres {
   private static final String EMAIL = "foo@bar.com";
   private static final String ISSUER = "issuer";
   private static final String SUBJECT = "subject";
   private static final String AUTHORITY_ID = "iss: issuer sub: subject";
 
-  private OidcCiviFormProfileAdapter oidcProfileAdapter;
+  private OidcProfileAdapter oidcProfileAdapter;
   private ProfileFactory profileFactory;
 
   @Before
@@ -45,7 +45,8 @@ public class OidcCiviFormProfileAdapterTest extends ResetPostgres {
 
   @Test
   public void getExistingApplicant_succeeds_noAuthorityFallsBackToEmail() {
-    // When an existing account doesn't have an authority_id we still find it by email.
+    // When an existing account doesn't have an authority_id we still find it by
+    // email.
 
     // Setup.
     // Existing account doesn't have an authority.
@@ -75,7 +76,8 @@ public class OidcCiviFormProfileAdapterTest extends ResetPostgres {
 
   @Test
   public void getExistingApplicant_succeeds_sameAuthorityDifferentEmail() {
-    // Authority ID is the main key and returns the local account even with different other old keys
+    // Authority ID is the main key and returns the local account even with
+    // different other old keys
     // like email.
 
     // Setup.
@@ -101,7 +103,8 @@ public class OidcCiviFormProfileAdapterTest extends ResetPostgres {
     assertThat(applicant).isPresent();
     Account account = applicant.get().getAccount();
 
-    // The email of the existing account is the pre-existing one, not a new profile one.
+    // The email of the existing account is the pre-existing one, not a new profile
+    // one.
     assertThat(account.getEmailAddress()).isEqualTo(otherEmail);
     assertThat(account.getAuthorityId()).isEqualTo(AUTHORITY_ID);
   }

@@ -24,7 +24,7 @@ import repository.UserRepository;
  * different implementations and profile adaptors,
  * and use different config values.
  */
-public abstract class OidcCiviFormProvider implements Provider<OidcClient> {
+public abstract class OidcProvider implements Provider<OidcClient> {
 
   protected final Config configuration;
   protected final ProfileFactory profileFactory;
@@ -41,7 +41,7 @@ public abstract class OidcCiviFormProvider implements Provider<OidcClient> {
   protected String extraScopesConfigName = "additional_scopes";
 
   @Inject
-  public OidcCiviFormProvider(
+  public OidcProvider(
       Config configuration,
       ProfileFactory profileFactory,
       Provider<UserRepository> applicantRepositoryProvider) {
@@ -60,7 +60,7 @@ public abstract class OidcCiviFormProvider implements Provider<OidcClient> {
   /*
    * Provide the profile adaptor that should be used.
    */
-  public abstract ProfileCreator getProfileAdapter(OidcConfiguration config, OidcClient client, Config appConfig);
+  public abstract ProfileCreator getProfileAdapter(OidcConfiguration config, OidcClient client);
 
   protected String getConfigurationValue(String attr, String defaultValue) {
     if (configuration.hasPath(attr)) {
@@ -158,7 +158,7 @@ public abstract class OidcCiviFormProvider implements Provider<OidcClient> {
     }
 
     client.setCallbackUrl(callbackURL);
-    client.setProfileCreator(getProfileAdapter(config, client, config));
+    client.setProfileCreator(getProfileAdapter(config, client));
     client.setCallbackUrlResolver(new PathParameterCallbackUrlResolver());
     client.init();
     return client;

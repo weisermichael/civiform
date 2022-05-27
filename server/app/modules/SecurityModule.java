@@ -15,8 +15,8 @@ import auth.FakeAdminClient;
 import auth.GuestClient;
 import auth.ProfileFactory;
 import auth.Roles;
-import auth.oidc.admin.AdOidcProvider;
-import auth.oidc.applicant.IdcsOidcProvider;
+import auth.oidc.admin.AdfsProvider;
+import auth.oidc.applicant.IdcsProvider;
 import auth.saml.LoginRadiusSamlProvider;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
@@ -120,7 +120,7 @@ public class SecurityModule extends AbstractModule {
     // this can be converted into a switch statement.
     bind(IndirectClient.class)
         .annotatedWith(AdminAuthClient.class)
-        .toProvider(AdOidcProvider.class);
+        .toProvider(AdfsProvider.class);
   }
 
   private void bindApplicantIdpProvider(String applicantIdpName) {
@@ -136,7 +136,7 @@ public class SecurityModule extends AbstractModule {
       default:
         bind(IndirectClient.class)
             .annotatedWith(ApplicantAuthClient.class)
-            .toProvider(IdcsOidcProvider.class);
+            .toProvider(IdcsProvider.class);
     }
   }
 

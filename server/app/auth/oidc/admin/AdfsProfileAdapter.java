@@ -3,7 +3,7 @@ package auth.oidc.admin;
 import auth.CiviFormProfile;
 import auth.ProfileFactory;
 import auth.Roles;
-import auth.oidc.OidcCiviFormProfileAdapter;
+import auth.oidc.OidcProfileAdapter;
 
 import com.google.common.collect.ImmutableSet;
 import com.nimbusds.jose.shaded.json.JSONArray;
@@ -24,7 +24,7 @@ import repository.UserRepository;
  * all that AD provides
  * right now.
  */
-public class AdfsProfileAdapter extends OidcCiviFormProfileAdapter {
+public class AdfsProfileAdapter extends OidcProfileAdapter {
   private static final Logger logger = LoggerFactory.getLogger(AdfsProfileAdapter.class);
 
   private final String adminGroupName;

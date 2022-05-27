@@ -60,7 +60,7 @@ public class LoginRadiusSamlProvider implements Provider<SAML2Client> {
     SAML2Client client = new SAML2Client(config);
 
     client.setProfileCreator(
-        new SamlCiviFormProfileAdapter(
+        new SamlProfileAdapter(
             config, client, profileFactory, applicantRepositoryProvider));
 
     client.setCallbackUrlResolver(new PathParameterCallbackUrlResolver());
