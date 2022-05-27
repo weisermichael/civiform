@@ -134,6 +134,11 @@ public class SecurityModule extends AbstractModule {
             .toProvider(LoginRadiusSamlProvider.class);
         logger.info("Using Login Radius for applicant auth provider");
         break;
+      case GENERIC_OIDC_APPLICANT:
+        bind(IndirectClient.class)
+            .annotatedWith(ApplicantAuthClient.class)
+            .toProvider(GenericOidcProvider.class);
+        break;
       case IDCS_APPLICANT:
       default:
         bind(IndirectClient.class)

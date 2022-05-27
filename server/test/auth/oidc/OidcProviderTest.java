@@ -201,5 +201,5 @@ public class OidcProviderTest extends ResetPostgres {
             });
     OidcClient client = badOidcProvider.get();
     assertThat(client).isNull();
-  }
+server/app/modules/SecurityModule.java   }
 }
