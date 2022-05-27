@@ -85,7 +85,7 @@ public abstract class OidcApplicantProfileAdapter extends OidcCiviFormProfileAda
     final String firstNameAttributeName = getFirstNameAttributeName();
     final String secondNameAttributeName = getSecondNameAttributeName();
 
-    String firstName,secondName;
+    String firstName = "", secondName = "";
     if (!firstNameAttributeName.isBlank()){
       firstName = oidcProfile.getAttribute(firstNameAttributeName, String.class);
     }
@@ -93,7 +93,7 @@ public abstract class OidcApplicantProfileAdapter extends OidcCiviFormProfileAda
       secondName = oidcProfile.getAttribute(secondNameAttributeName, String.class);
     }
     if (!firstName.isBlank() && !secondName.isBlank()) {
-      return String.format("%s %s", firstName, secondName)
+      return String.format("%s %s", firstName, secondName);
     }
     else if (!firstName.isBlank()) {
       return firstName;

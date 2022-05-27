@@ -3,7 +3,6 @@ package auth.oidc;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import auth.ProfileFactory;
-import auth.ProfileAdapter;
 import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import javax.inject.Provider;
