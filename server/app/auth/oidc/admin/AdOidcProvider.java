@@ -1,8 +1,9 @@
-package auth.oidc;
+package auth.oidc.admin;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import auth.ProfileFactory;
+
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.typesafe.config.Config;
@@ -58,7 +59,7 @@ public class AdOidcProvider implements Provider<OidcClient> {
     // (needs to also be configured on AD side).
     // Note: ADFS has the extra claim: allatclaims which returns
     // access token in the id_token.
-    String[] defaultScopes = {"openid", "profile", "email"};
+    String[] defaultScopes = { "openid", "profile", "email" };
     String[] extraScopes = configuration.getString("adfs.additional_scopes").split(" ");
     ArrayList<String> allClaims = new ArrayList<>();
     Collections.addAll(allClaims, defaultScopes);
@@ -78,7 +79,7 @@ public class AdOidcProvider implements Provider<OidcClient> {
     // combined with the name to create the url.
     client.setCallbackUrl(baseUrl + "/callback");
 
-    // This is specific to the implemention using pac4j. pac4j has concept
+    // This is specific to the implemention using pac4j. pac4j has concept\
     // of a profile for different identity profiles we have different creators.
     // This is what links the user to the stuff they have access to.
     client.setProfileCreator(

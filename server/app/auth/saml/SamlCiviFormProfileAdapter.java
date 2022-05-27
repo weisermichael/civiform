@@ -3,6 +3,7 @@ package auth.saml;
 import auth.CiviFormProfile;
 import auth.CiviFormProfileData;
 import auth.CiviFormProfileMerger;
+import auth.ProfileAdapter;
 import auth.ProfileFactory;
 import auth.ProfileUtils;
 import auth.Roles;
@@ -29,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import repository.UserRepository;
 
-public class SamlCiviFormProfileAdapter extends AuthenticatorProfileCreator {
+public class SamlCiviFormProfileAdapter extends AuthenticatorProfileCreator implements ProfileAdapter {
 
   private static final Logger logger = LoggerFactory.getLogger(SamlCiviFormProfileAdapter.class);
   protected final CiviFormProfileMerger civiFormProfileMerger;

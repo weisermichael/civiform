@@ -3,6 +3,8 @@ package auth.oidc;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import auth.ProfileFactory;
+import auth.oidc.applicant.IdcsProfileAdapter;
+
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
 import javax.inject.Provider;

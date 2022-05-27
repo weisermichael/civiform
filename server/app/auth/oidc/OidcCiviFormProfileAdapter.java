@@ -57,6 +57,31 @@ public abstract class OidcCiviFormProfileAdapter extends OidcProfileCreator {
 
   protected abstract void adaptForRole(CiviFormProfile profile, ImmutableSet<Roles> roles);
 
+  /**
+   * Create a totally new CiviForm profile informed by the provided OidcProfile.
+   */
+  public abstract CiviFormProfile createEmptyCiviFormProfile(OidcProfile profile);
+
+  protected Optional<String> getEmail(OidcProfile oidcProfile) {
+    final String emailAttributeName = emailAttributeName();
+
+    if (!emailAttributeName.isBlank()) {
+      return Optional.ofNullable(oidcProfile.getAttribute(emailAttributeName, String.class));
+    }
+    return Optional.empty();
+  }
+
+  protected String getConfigurationValue(String attr) {
+    return getConfigurationValue(attr, "");
+  }
+
+  protected String getConfigurationValue(String attr, String defaultValue) {
+    if (configuration.hasPath(attr)) {
+      return configuration.getString(attr);
+    }
+    return defaultValue;
+  }
+
   protected Optional<String> getAuthorityId(OidcProfile oidcProfile) {
     // In OIDC the user is uniquely identified by the iss(user) and sub(ject) claims.
     // https://openid.net/specs/openid-connect-core-1_0.html#IDToken
@@ -94,19 +119,17 @@ public abstract class OidcCiviFormProfileAdapter extends OidcProfileCreator {
   /** Merge the two provided profiles into a new CiviFormProfileData. */
   protected CiviFormProfileData mergeCiviFormProfile(
       CiviFormProfile civiformProfile, OidcProfile oidcProfile) {
-    String emailAddress =
-        Optional.ofNullable(oidcProfile.getAttribute(emailAttributeName(), String.class))
-            .orElseThrow(
+    String emailAddress = getEmail(oidcProfile).orElseThrow(
                 () -> new InvalidOidcProfileException("Unable to get email from profile."));
+    civiformProfile.setEmailAddress(emailAddress).join();
 
-    String authorityId =
-        getAuthorityId(oidcProfile)
-            .orElseThrow(
+    String authorityId = getAuthorityId(oidcProfile).orElseThrow(
                 () -> new InvalidOidcProfileException("Unable to get authority ID from profile."));
 
-    civiformProfile.setEmailAddress(emailAddress).join();
     civiformProfile.setAuthorityId(authorityId).join();
+
     civiformProfile.getProfileData().addAttribute(CommonProfileDefinition.EMAIL, emailAddress);
+
     // Meaning: whatever you signed in with most recently is the role you have.
     ImmutableSet<Roles> roles = roles(civiformProfile, oidcProfile);
     roles.stream()
@@ -115,9 +138,6 @@ public abstract class OidcCiviFormProfileAdapter extends OidcProfileCreator {
     adaptForRole(civiformProfile, roles);
     return civiformProfile.getProfileData();
   }
-
-  /** Create a totally new CiviForm profile informed by the provided OidcProfile. */
-  public abstract CiviFormProfile createEmptyCiviFormProfile(OidcProfile profile);
 
   @Override
   public Optional<UserProfile> create(
