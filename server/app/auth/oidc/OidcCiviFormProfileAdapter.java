@@ -1,17 +1,13 @@
 package auth.oidc;
 
-import auth.CiviFormProfile;
-import auth.CiviFormProfileData;
-import auth.CiviFormProfileMerger;
-import auth.ProfileFactory;
-import auth.ProfileUtils;
-import auth.Roles;
+import java.util.Optional;
+
+import javax.inject.Provider;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import java.util.Optional;
-import javax.inject.Provider;
-import models.Applicant;
+
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.Credentials;
@@ -23,6 +19,14 @@ import org.pac4j.oidc.profile.OidcProfile;
 import org.pac4j.oidc.profile.creator.OidcProfileCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import auth.CiviFormProfile;
+import auth.CiviFormProfileData;
+import auth.CiviFormProfileMerger;
+import auth.ProfileFactory;
+import auth.ProfileUtils;
+import auth.Roles;
+import models.Applicant;
 import repository.UserRepository;
 
 /**

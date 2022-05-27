@@ -1,14 +1,16 @@
 package auth.oidc.applicant;
 
-import auth.ProfileFactory;
-import auth.oidc.OidcCiviFormProvider;
+import javax.inject.Provider;
 
-import org.pac4j.core.profile.creator.ProfileCreator;
 import com.google.inject.Inject;
 import com.typesafe.config.Config;
-import javax.inject.Provider;
+
+import org.pac4j.core.profile.creator.ProfileCreator;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
+
+import auth.ProfileFactory;
+import auth.oidc.OidcCiviFormProvider;
 import repository.UserRepository;
 
 /**

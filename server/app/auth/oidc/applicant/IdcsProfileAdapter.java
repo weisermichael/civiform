@@ -1,10 +1,5 @@
 package auth.oidc.applicant;
 
-import auth.ProfileFactory;
-
-import com.google.common.collect.ImmutableMap;
-import com.nimbusds.jose.util.DefaultResourceRetriever;
-import com.nimbusds.jose.util.Resource;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -12,15 +7,23 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Provider;
+
+import com.google.common.collect.ImmutableMap;
+import com.nimbusds.jose.util.DefaultResourceRetriever;
+import com.nimbusds.jose.util.Resource;
+import com.typesafe.config.Config;
+
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.oidc.credentials.OidcCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import auth.ProfileFactory;
 import repository.UserRepository;
-import com.typesafe.config.Config;
 
 /**
  * This class takes an existing CiviForm profile and augments it with the

@@ -2,17 +2,21 @@ package auth.oidc;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import auth.ProfileFactory;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import javax.inject.Provider;
+
 import com.google.inject.Inject;
 import com.typesafe.config.Config;
-import javax.inject.Provider;
+
 import org.pac4j.core.http.callback.PathParameterCallbackUrlResolver;
 import org.pac4j.core.profile.creator.ProfileCreator;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
+
+import auth.ProfileFactory;
 import repository.UserRepository;
-import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * This class provides the base applicant OIDC implementation.

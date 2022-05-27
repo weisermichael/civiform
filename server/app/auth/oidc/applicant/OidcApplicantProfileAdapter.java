@@ -1,33 +1,26 @@
 package auth.oidc.applicant;
 
-import auth.CiviFormProfile;
-import auth.CiviFormProfileData;
-import auth.CiviFormProfileMerger;
-import auth.ProfileFactory;
-import auth.ProfileUtils;
-import auth.Roles;
-import auth.oidc.OidcCiviFormProfileAdapter;
+import java.util.Locale;
 
-import com.google.common.annotations.VisibleForTesting;
+import javax.inject.Provider;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import java.util.Optional;
-import javax.inject.Provider;
-import models.Applicant;
-import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
+import com.typesafe.config.Config;
+
 import org.pac4j.core.credentials.Credentials;
-import org.pac4j.core.profile.UserProfile;
-import org.pac4j.core.profile.definition.CommonProfileDefinition;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.oidc.profile.OidcProfile;
-import org.pac4j.oidc.profile.creator.OidcProfileCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import auth.CiviFormProfile;
+import auth.CiviFormProfileData;
+import auth.ProfileFactory;
+import auth.Roles;
+import auth.oidc.OidcCiviFormProfileAdapter;
 import repository.UserRepository;
-import com.typesafe.config.Config;
-import java.util.Locale;
 
 /**
  * This class ensures that the OidcProfileCreator that both the AD and IDCS
