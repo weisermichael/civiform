@@ -48,9 +48,9 @@ import org.pac4j.play.CallbackController;
 import org.pac4j.play.LogoutController;
 import org.pac4j.play.store.PlayCookieSessionStore;
 import org.pac4j.play.store.ShiroAesDataEncrypter;
-import play.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.Environment;
 
 /** SecurityModule configures and initializes all authentication and authorization classes. */
 public class SecurityModule extends AbstractModule {
@@ -121,9 +121,7 @@ public class SecurityModule extends AbstractModule {
   private void bindAdminIdpProvider() {
     // Currently the only supported admin auth provider. As we add other admin auth providers,
     // this can be converted into a switch statement.
-    bind(IndirectClient.class)
-        .annotatedWith(AdminAuthClient.class)
-        .toProvider(AdfsProvider.class);
+    bind(IndirectClient.class).annotatedWith(AdminAuthClient.class).toProvider(AdfsProvider.class);
   }
 
   private void bindApplicantIdpProvider(String applicantIdpName) {

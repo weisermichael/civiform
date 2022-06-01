@@ -46,7 +46,8 @@ public class SamlProfileAdapter extends AuthenticatorProfileCreator {
     super();
     this.profileFactory = Preconditions.checkNotNull(profileFactory);
     this.applicantRepositoryProvider = Preconditions.checkNotNull(applicantRepositoryProvider);
-    this.civiFormProfileMerger = new CiviFormProfileMerger(profileFactory, applicantRepositoryProvider);
+    this.civiFormProfileMerger =
+        new CiviFormProfileMerger(profileFactory, applicantRepositoryProvider);
     this.saml2Client = client;
     this.saml2Configuration = configuration;
   }
@@ -82,9 +83,10 @@ public class SamlProfileAdapter extends AuthenticatorProfileCreator {
     // authority_id is used as the unique stable key for users. This is unique and
     // stable per
     // authentication provider.
-    String authorityId = getAuthorityId(profile)
-        .orElseThrow(
-            () -> new InvalidSamlProfileException("Unable to get authority ID from profile."));
+    String authorityId =
+        getAuthorityId(profile)
+            .orElseThrow(
+                () -> new InvalidSamlProfileException("Unable to get authority ID from profile."));
 
     return applicantRepositoryProvider
         .get()
@@ -118,14 +120,16 @@ public class SamlProfileAdapter extends AuthenticatorProfileCreator {
   @VisibleForTesting
   public CiviFormProfileData mergeCiviFormProfile(
       Optional<CiviFormProfile> maybeCiviFormProfile, SAML2Profile saml2Profile) {
-    var civiFormProfile = maybeCiviFormProfile.orElseGet(
-        () -> {
-          logger.debug("Found no existing profile in session cookie.");
-          return createEmptyCiviformProfile();
-        });
-    String authorityId = getAuthorityId(saml2Profile)
-        .orElseThrow(
-            () -> new InvalidSamlProfileException("Unable to get authority ID from profile"));
+    var civiFormProfile =
+        maybeCiviFormProfile.orElseGet(
+            () -> {
+              logger.debug("Found no existing profile in session cookie.");
+              return createEmptyCiviformProfile();
+            });
+    String authorityId =
+        getAuthorityId(saml2Profile)
+            .orElseThrow(
+                () -> new InvalidSamlProfileException("Unable to get authority ID from profile"));
     civiFormProfile.setAuthorityId(authorityId).join();
 
     final String locale = saml2Profile.getAttribute("locale", String.class);
@@ -175,7 +179,8 @@ public class SamlProfileAdapter extends AuthenticatorProfileCreator {
   }
 
   private String extractAttributeFromArrayList(SAML2Profile profile, String attr) {
-    Optional<ArrayList> attributeArray = Optional.ofNullable(profile.getAttribute(attr, ArrayList.class));
+    Optional<ArrayList> attributeArray =
+        Optional.ofNullable(profile.getAttribute(attr, ArrayList.class));
     if (attributeArray.isEmpty()) {
       return "";
     }

@@ -2,20 +2,16 @@ package auth.oidc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Optional;
-
-import javax.inject.Provider;
-
+import auth.ProfileFactory;
+import auth.oidc.applicant.IdcsProfileAdapter;
 import com.google.common.collect.ImmutableList;
-
+import java.util.Optional;
+import javax.inject.Provider;
+import models.Account;
+import models.Applicant;
 import org.junit.Before;
 import org.junit.Test;
 import org.pac4j.oidc.profile.OidcProfile;
-
-import auth.ProfileFactory;
-import auth.oidc.applicant.IdcsProfileAdapter;
-import models.Account;
-import models.Applicant;
 import repository.ResetPostgres;
 import repository.UserRepository;
 
@@ -80,8 +76,7 @@ public class OidcProfileAdapterTest extends ResetPostgres {
   @Test
   public void getExistingApplicant_succeeds_sameAuthorityDifferentEmail() {
     // Authority ID is the main key and returns the local account even with
-    // different other old keys
-    // like email.
+    // different other old keys like email.
 
     // Setup.
     final String otherEmail = "OTHER@EMAIL.com";

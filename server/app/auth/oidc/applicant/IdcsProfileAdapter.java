@@ -1,5 +1,9 @@
 package auth.oidc.applicant;
 
+import auth.ProfileFactory;
+import com.google.common.collect.ImmutableMap;
+import com.nimbusds.jose.util.DefaultResourceRetriever;
+import com.nimbusds.jose.util.Resource;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,26 +11,17 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.inject.Provider;
-
-import com.google.common.collect.ImmutableMap;
-import com.nimbusds.jose.util.DefaultResourceRetriever;
-import com.nimbusds.jose.util.Resource;
-
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.oidc.credentials.OidcCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import auth.ProfileFactory;
 import repository.UserRepository;
 
 /**
- * This class takes an existing CiviForm profile and augments it with the
- * information from an IDCS
+ * This class takes an existing CiviForm profile and augments it with the information from an IDCS
  * profile.
  */
 public class IdcsProfileAdapter extends OidcApplicantProfileAdapter {
@@ -37,14 +32,20 @@ public class IdcsProfileAdapter extends OidcApplicantProfileAdapter {
       OidcClient client,
       ProfileFactory profileFactory,
       Provider<UserRepository> applicantRepositoryProvider) {
-    super(configuration, client, /* app_configuration= */ null, profileFactory, applicantRepositoryProvider);
+    super(
+        configuration,
+        client,
+        /* app_configuration= */ null,
+        profileFactory,
+        applicantRepositoryProvider);
   }
 
   // Manually specify all app_configuration params.
   @Override
   protected String attributePrefix() {
     return "idcs";
-  };
+  }
+  ;
 
   @Override
   protected String getEmailAttributeName() {
@@ -73,20 +74,18 @@ public class IdcsProfileAdapter extends OidcApplicantProfileAdapter {
 
   @Override
   protected void possiblyModifyConfigBasedOnCred(Credentials cred) {
-    // The flow here is not immediately intuitive. IDCS is to blame. :)
-    // The normal flow for authenticating a user is "get user's data via POST.
-    // Decode it, check that it is signed, and use it." IDCS throws in an extra step
-    // here - in order to get IDCS's signing key, we need to provide an
-    // Authorization
-    // header proving that we have a good reason to use the signing key.
-    // Pac4j and associated tools are not well-suited to that, because it's
-    // a deviation from the OIDC spec. Pac4j has the concept of a "resource
-    // retriever",
-    // which is used to fetch things like the signing key. They are meant to
-    // be configured once and used indefinitely, but we only get the access
-    // token at the time the user logs in and is redirected to our server. So,
-    // we need to slighly abuse the notion of a resource retriever. We create our
-    // own modified resource retriever which has access to the required token.
+    // The flow here is not immediately intuitive. IDCS is to blame. :) The normal
+    // flow for authenticating a user is "get user's data via POST. Decode it, check
+    // that it is signed, and use it." IDCS throws in an extra step here - in order
+    // to get IDCS's signing key, we need to provide an Authorization header proving
+    // that we have a good reason to use the signing key. Pac4j and associated tools
+    // are not well-suited to that, because it's a deviation from the OIDC spec.
+    // Pac4j has the concept of a "resource retriever", which is used to fetch
+    // things like the signing key. They are meant to be configured once and used
+    // indefinitely, but we only get the access token at the time the user logs in
+    // and is redirected to our server. So, we need to slighly abuse the notion of a
+    // resource retriever. We create our own modified resource retriever which has
+    // access to the required token.
 
     if (((OidcCredentials) cred).getAccessToken() == null) {
       logger.debug("No access token in the credentials.");
@@ -100,10 +99,11 @@ public class IdcsProfileAdapter extends OidcApplicantProfileAdapter {
 
     try {
       URI jwkSetUri = this.configuration.getProviderMetadata().getJWKSetURI();
-      ImmutableMap<URI, Resource> jwkCache = ImmutableMap.of(
-          jwkSetUri,
-          new CredentialedResourceRetriever(configuration, cred)
-              .retrieveResource(jwkSetUri.toURL()));
+      ImmutableMap<URI, Resource> jwkCache =
+          ImmutableMap.of(
+              jwkSetUri,
+              new CredentialedResourceRetriever(configuration, cred)
+                  .retrieveResource(jwkSetUri.toURL()));
       this.configuration.setResourceRetriever(new CachedResourceRetriever(configuration, jwkCache));
     } catch (IOException | NullPointerException e) {
       logger.error("Failed to fetch JWK", e);

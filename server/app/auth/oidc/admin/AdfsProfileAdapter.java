@@ -1,29 +1,24 @@
 package auth.oidc.admin;
 
-import javax.inject.Provider;
-
+import auth.CiviFormProfile;
+import auth.ProfileFactory;
+import auth.Roles;
+import auth.oidc.OidcProfileAdapter;
 import com.google.common.collect.ImmutableSet;
 import com.nimbusds.jose.shaded.json.JSONArray;
 import com.typesafe.config.Config;
-
+import javax.inject.Provider;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.oidc.profile.OidcProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import auth.CiviFormProfile;
-import auth.ProfileFactory;
-import auth.Roles;
-import auth.oidc.OidcProfileAdapter;
 import repository.UserRepository;
 
 /**
- * This class takes an existing CiviForm profile and augments it with the
- * information from an AD
- * profile. Right now this is only extracting the email address, since that is
- * all that AD provides
+ * This class takes an existing CiviForm profile and augments it with the information from an AD
+ * profile. Right now this is only extracting the email address, since that is all that AD provides
  * right now.
  */
 public class AdfsProfileAdapter extends OidcProfileAdapter {

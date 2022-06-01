@@ -2,28 +2,23 @@ package auth.oidc;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import auth.ProfileFactory;
+import com.typesafe.config.Config;
 import java.util.ArrayList;
 import java.util.Collections;
-
 import javax.inject.Provider;
-
-import com.typesafe.config.Config;
-
 import org.pac4j.core.http.callback.PathParameterCallbackUrlResolver;
 import org.pac4j.core.profile.creator.ProfileCreator;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import auth.ProfileFactory;
 import repository.UserRepository;
 
 /**
- * This class provides the base applicant OIDC implementation.
- * It's abstract because AD and other providers need slightly
- * different implementations and profile adaptors,
- * and use different config values.
+ * This class provides the base applicant OIDC implementation. It's abstract because AD and other
+ * providers need slightly different implementations and profile adaptors, and use different config
+ * values.
  */
 public abstract class OidcProvider implements Provider<OidcClient> {
 
@@ -33,7 +28,7 @@ public abstract class OidcProvider implements Provider<OidcClient> {
   protected final Provider<UserRepository> applicantRepositoryProvider;
   protected final String baseUrl;
 
-  protected String[] defaultScopes = { "openid", "profile", "email" };
+  protected String[] defaultScopes = {"openid", "profile", "email"};
 
   private String providerNameConfigName = "provider_name";
   private String clientIDConfigName = "client_id";
@@ -103,8 +98,7 @@ public abstract class OidcProvider implements Provider<OidcClient> {
   }
 
   protected String[] getExtraScopes() {
-    return getConfigurationValue(attributePrefix() + "." + extraScopesConfigName)
-        .split(" ");
+    return getConfigurationValue(attributePrefix() + "." + extraScopesConfigName).split(" ");
   }
 
   protected String getCallbackURL() {
@@ -131,17 +125,34 @@ public abstract class OidcProvider implements Provider<OidcClient> {
     String responseType = getResponseType();
     String callbackURL = getCallbackURL();
     String providerName = getProviderName(); // optional
-    if (clientID.isEmpty() || clientSecret.isEmpty() ||
-        discoveryURI.isEmpty() || responseMode.isEmpty() ||
-        responseType.isEmpty() || callbackURL.isEmpty()) {
-      logger.error("Missing Provider data:\n" +
-          "clientID=" + clientID + "\n" +
-          "clientSecret=" + clientSecret + "\n" +
-          "discoveryURI=" + discoveryURI + "\n" +
-          "responseMode=" + responseMode + "\n" +
-          "responseType=" + responseType + "\n" +
-          "callbackURL=" + callbackURL + "\n" +
-          "providerName=" + providerName);
+    if (clientID.isEmpty()
+        || clientSecret.isEmpty()
+        || discoveryURI.isEmpty()
+        || responseMode.isEmpty()
+        || responseType.isEmpty()
+        || callbackURL.isEmpty()) {
+      logger.error(
+          "Missing Provider data:\n"
+              + "clientID="
+              + clientID
+              + "\n"
+              + "clientSecret="
+              + clientSecret
+              + "\n"
+              + "discoveryURI="
+              + discoveryURI
+              + "\n"
+              + "responseMode="
+              + responseMode
+              + "\n"
+              + "responseType="
+              + responseType
+              + "\n"
+              + "callbackURL="
+              + callbackURL
+              + "\n"
+              + "providerName="
+              + providerName);
       throw new RuntimeException("Can't get OIDC client, data is missing");
     }
     OidcConfiguration config = new OidcConfiguration();

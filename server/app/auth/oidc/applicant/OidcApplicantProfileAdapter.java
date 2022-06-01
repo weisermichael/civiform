@@ -1,34 +1,26 @@
 package auth.oidc.applicant;
 
-import java.util.Locale;
-import java.util.Objects;
-
-import javax.inject.Provider;
-
-import com.google.common.collect.ImmutableSet;
-import com.typesafe.config.Config;
-
-import org.pac4j.core.credentials.Credentials;
-import org.pac4j.oidc.client.OidcClient;
-import org.pac4j.oidc.config.OidcConfiguration;
-import org.pac4j.oidc.profile.OidcProfile;
-
 import auth.CiviFormProfile;
 import auth.CiviFormProfileData;
 import auth.ProfileFactory;
 import auth.Roles;
 import auth.oidc.OidcProfileAdapter;
+import com.google.common.collect.ImmutableSet;
+import com.typesafe.config.Config;
+import java.util.Locale;
+import java.util.Objects;
+import javax.inject.Provider;
+import org.pac4j.core.credentials.Credentials;
+import org.pac4j.oidc.client.OidcClient;
+import org.pac4j.oidc.config.OidcConfiguration;
+import org.pac4j.oidc.profile.OidcProfile;
 import repository.UserRepository;
 
 /**
- * This class ensures that the OidcProfileCreator that both the AD and IDCS
- * clients use will
- * generate a CiviFormProfile object. This is necessary for merging those
- * accounts with existing
- * accounts - that's not usually needed in web applications which is why we have
- * to write this class
- * - pac4j doesn't come with it. It's abstract because AD and IDCS need slightly
- * different
+ * This class ensures that the OidcProfileCreator that both the AD and IDCS clients use will
+ * generate a CiviFormProfile object. This is necessary for merging those accounts with existing
+ * accounts - that's not usually needed in web applications which is why we have to write this class
+ * - pac4j doesn't come with it. It's abstract because AD and IDCS need slightly different
  * implementations of the two abstract methods.
  */
 public abstract class OidcApplicantProfileAdapter extends OidcProfileAdapter {
@@ -87,16 +79,17 @@ public abstract class OidcApplicantProfileAdapter extends OidcProfileAdapter {
     final String secondNameAttributeName = getSecondNameAttributeName();
 
     String firstName = "", secondName = "";
-    if (!firstNameAttributeName.isBlank()){
-      firstName = Objects.toString(oidcProfile.getAttribute(firstNameAttributeName, String.class), "");
+    if (!firstNameAttributeName.isBlank()) {
+      firstName =
+          Objects.toString(oidcProfile.getAttribute(firstNameAttributeName, String.class), "");
     }
-    if (!secondNameAttributeName.isBlank()){
-      secondName = Objects.toString(oidcProfile.getAttribute(secondNameAttributeName, String.class), "");
+    if (!secondNameAttributeName.isBlank()) {
+      secondName =
+          Objects.toString(oidcProfile.getAttribute(secondNameAttributeName, String.class), "");
     }
     if (!firstName.isBlank() && !secondName.isBlank()) {
       return String.format("%s %s", firstName, secondName);
-    }
-    else if (!firstName.isBlank()) {
+    } else if (!firstName.isBlank()) {
       return firstName;
     }
     return secondName;
@@ -114,12 +107,10 @@ public abstract class OidcApplicantProfileAdapter extends OidcProfileAdapter {
   @Override
   protected String emailAttributeName() {
     return getEmailAttributeName();
-  };
+  }
+  ;
 
-  /**
-   * Create a totally new Applicant CiviForm profile informed by the provided
-   * OidcProfile.
-   */
+  /** Create a totally new Applicant CiviForm profile informed by the provided OidcProfile. */
   @Override
   public CiviFormProfile createEmptyCiviFormProfile(OidcProfile profile) {
     return profileFactory.wrapProfileData(profileFactory.createNewApplicant());
@@ -163,9 +154,7 @@ public abstract class OidcApplicantProfileAdapter extends OidcProfileAdapter {
                   applicant.getApplicantData().setPreferredLocale(Locale.forLanguageTag(locale));
                 }
                 if (!name.isBlank()) {
-                  applicant
-                      .getApplicantData()
-                      .setUserName(name);
+                  applicant.getApplicantData().setUserName(name);
                 }
                 applicant.save();
                 return null;
@@ -176,5 +165,4 @@ public abstract class OidcApplicantProfileAdapter extends OidcProfileAdapter {
 
     return super.mergeCiviFormProfile(civiformProfile, oidcProfile);
   }
-
 }
