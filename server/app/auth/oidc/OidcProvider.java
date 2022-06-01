@@ -6,6 +6,7 @@ import auth.ProfileFactory;
 import com.typesafe.config.Config;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 import javax.inject.Provider;
 import org.pac4j.core.http.callback.PathParameterCallbackUrlResolver;
 import org.pac4j.core.profile.creator.ProfileCreator;
@@ -45,7 +46,7 @@ public abstract class OidcProvider implements Provider<OidcClient> {
     this.profileFactory = checkNotNull(profileFactory);
     this.applicantRepositoryProvider = applicantRepositoryProvider;
 
-    baseUrl = configuration.getString("base_url");
+    baseUrl = getConfigurationValue("base_url");
   }
 
   /*
@@ -118,42 +119,41 @@ public abstract class OidcProvider implements Provider<OidcClient> {
 
   @Override
   public OidcClient get() {
-    String clientID = getClientID();
-    String clientSecret = getClientSecret();
-    String discoveryURI = getDiscoveryURI();
-    String responseMode = getResponseMode();
-    String responseType = getResponseType();
-    String callbackURL = getCallbackURL();
-    String providerName = getProviderName(); // optional
-    if (clientID.isEmpty()
-        || clientSecret.isEmpty()
-        || discoveryURI.isEmpty()
-        || responseMode.isEmpty()
-        || responseType.isEmpty()
-        || callbackURL.isEmpty()) {
+    String clientID = Objects.toString(getClientID(), "");
+    String clientSecret = Objects.toString(getClientSecret(), "");
+    String discoveryURI = Objects.toString(getDiscoveryURI(), "");
+    String responseMode = Objects.toString(getResponseMode(), "");
+    String responseType = Objects.toString(getResponseType(), "");
+    String callbackURL = Objects.toString(getCallbackURL(), "");
+    String providerName = Objects.toString(getProviderName(), ""); // optional
+    String scopes = Objects.toString(getScopes(), "");
+    if (clientID.isBlank()
+        || clientSecret.isBlank()
+        || discoveryURI.isBlank()
+        || responseMode.isBlank()
+        || responseType.isBlank()
+        || callbackURL.isBlank()
+        || baseUrl.isBlank()) {
       logger.error(
-          "Missing Provider data:\n"
-              + "clientID="
-              + clientID
-              + "\n"
-              + "clientSecret="
-              + clientSecret
-              + "\n"
-              + "discoveryURI="
-              + discoveryURI
-              + "\n"
-              + "responseMode="
-              + responseMode
-              + "\n"
-              + "responseType="
-              + responseType
-              + "\n"
-              + "callbackURL="
-              + callbackURL
-              + "\n"
-              + "providerName="
-              + providerName);
-      throw new RuntimeException("Can't get OIDC client, data is missing");
+          String.format(
+              "Can't get OIDC client - Missing Provider data:\n"
+                  + " baseUrl=%s\n"
+                  + " clientID=%s \n"
+                  + " clientSecret=%s \n"
+                  + " discoveryURI=%s \n"
+                  + " responseMode=%s \n"
+                  + " responseType=%s \n"
+                  + " callbackURL=%s \n"
+                  + " providerName=%s",
+              baseUrl,
+              clientID,
+              clientSecret,
+              discoveryURI,
+              responseMode,
+              responseType,
+              callbackURL,
+              providerName));
+      return null;
     }
     OidcConfiguration config = new OidcConfiguration();
 
@@ -168,11 +168,11 @@ public abstract class OidcProvider implements Provider<OidcClient> {
     config.setUseNonce(true);
     config.setWithState(false);
 
-    config.setScope(getScopes());
+    config.setScope(scopes);
 
     OidcClient client = new OidcClient(config);
 
-    if (!providerName.isEmpty()) {
+    if (!providerName.isBlank()) {
       client.setName(providerName);
     }
 

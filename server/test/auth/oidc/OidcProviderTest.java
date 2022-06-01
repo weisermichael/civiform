@@ -1,21 +1,21 @@
 package auth.oidc;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
 import auth.ProfileFactory;
 import auth.oidc.applicant.IdcsProfileAdapter;
 import auth.oidc.applicant.IdcsProvider;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import java.util.stream.Stream;
 import javax.inject.Provider;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import junitparams.naming.TestCaseName;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.runner.RunWith;
 import org.pac4j.core.profile.creator.ProfileCreator;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
@@ -23,17 +23,29 @@ import play.api.test.Helpers;
 import repository.ResetPostgres;
 import repository.UserRepository;
 
+@RunWith(JUnitParamsRunner.class)
 public class OidcProviderTest extends ResetPostgres {
   private OidcProvider oidcProvider;
   private ProfileFactory profileFactory;
   private static UserRepository userRepository;
-  private Config config;
+  private static String discoveryUri = "http://oidc:3380/.well-known/openid-configuration";
+  private static String baseUrl = String.format("http://localhost:%d", Helpers.testServerPort());
 
   @Before
   public void setup() {
     userRepository = instanceOf(UserRepository.class);
     profileFactory = instanceOf(ProfileFactory.class);
-    config = ConfigFactory.parseMap(oidcConfig());
+    Config config =
+        ConfigFactory.parseMap(
+            ImmutableMap.of(
+                "idcs.client_id",
+                "foo",
+                "idcs.secret",
+                "bar",
+                "idcs.discovery_uri",
+                discoveryUri,
+                "base_url",
+                baseUrl));
 
     // Just need some complete adaptor to access methods.
     oidcProvider =
@@ -48,18 +60,6 @@ public class OidcProviderTest extends ResetPostgres {
             });
   }
 
-  public static ImmutableMap<String, Object> oidcConfig() {
-    return ImmutableMap.of(
-        "idcs.client_id",
-        "foo",
-        "idcs.secret",
-        "bar",
-        "idcs.discovery_uri",
-        "http://dev-oidc:3390/.well-known/openid-configuration",
-        "base_url",
-        String.format("http://localhost:%d", Helpers.testServerPort()));
-  }
-
   @Test
   public void Test_getConfigurationValues() {
     String client_id = oidcProvider.getClientID();
@@ -69,39 +69,38 @@ public class OidcProviderTest extends ResetPostgres {
     assertThat(client_secret).isEqualTo("bar");
   }
 
-  static Stream<Arguments> provideConfigsForGet() {
-    return Stream.of(
-        Arguments.of(
-            "normal",
-            "id_token",
-            ImmutableMap.of(
-                "idcs.client_id", "foo",
-                "idcs.secret", "bar",
-                "idcs.discovery_uri", "http://dev-oidc:3390/.well-known/openid-configuration",
-                "base_url", String.format("http://localhost:%d", Helpers.testServerPort()))),
-        Arguments.of(
-            "Not Localhost",
-            "id_token token",
-            ImmutableMap.of(
-                "idcs.client_id", "happy",
-                "idcs.secret", "lucky",
-                "idcs.discovery_uri", "http://civiform.dev/.well-known/openid-configuration",
-                "base_url", "http://civiform.dec")),
-        Arguments.of(
-            "extra args that aren't used",
-            "id_token",
-            ImmutableMap.of(
-                "idcs.client_id", "foo",
-                "idcs.secret", "bar",
-                "idcs.provider_name", "Provider Name here",
-                "idcs.response_mode", "Try to override",
-                "idcs.additional_scopes", "No more scopes",
-                "idcs.discovery_uri", "http://dev-oidc:3390/.well-known/openid-configuration",
-                "base_url", String.format("http://localhost:%d", Helpers.testServerPort()))));
+  static ImmutableList<Object[]> provideConfigsForGet() {
+    return ImmutableList.of(
+        new Object[] {
+          "normal",
+          "id_token",
+          ImmutableMap.of(
+              "idcs.client_id",
+              "foo",
+              "idcs.secret",
+              "bar",
+              "idcs.discovery_uri",
+              discoveryUri,
+              "base_url",
+              baseUrl)
+        },
+        new Object[] {
+          "extra args that aren't used",
+          "id_token",
+          ImmutableMap.of(
+              "idcs.client_id", "foo",
+              "idcs.secret", "bar",
+              "idcs.provider_name", "Provider Name here",
+              "idcs.response_mode", "Try to override",
+              "idcs.additional_scopes", "No more scopes",
+              "idcs.discovery_uri", discoveryUri,
+              "base_url", baseUrl)
+        });
   }
 
-  @ParameterizedTest(name = "{index} {0} config should be parsable")
-  @MethodSource("provideConfigsForGet")
+  @Test
+  @TestCaseName("{index} {0} config get() should be parsable")
+  @Parameters(method = "provideConfigsForGet")
   public void Test_get(String name, String wantResponseType, ImmutableMap<String, String> c) {
     Config config = ConfigFactory.parseMap(c);
 
@@ -118,7 +117,7 @@ public class OidcProviderTest extends ResetPostgres {
     OidcClient client = oidcProvider.get();
 
     assertThat(client.getCallbackUrl()).isEqualTo(c.get("base_url") + "/callback");
-    assertThat(client.getName()).isEqualTo("");
+    assertThat(client.getName()).isEqualTo("OidcClient");
 
     OidcConfiguration client_config = client.getConfiguration();
 
@@ -134,53 +133,60 @@ public class OidcProviderTest extends ResetPostgres {
     assertThat(adaptor.getClass()).isEqualTo(IdcsProfileAdapter.class);
   }
 
-  static Stream<Arguments> provideConfigsForInvalidConfig() {
-    return Stream.of(
-        Arguments.of(
-            "normal",
-            ImmutableMap.of(
-                "idcs.client_id", "foo",
-                "idcs.secret", "bar",
-                "idcs.discovery_uri", "http://dev-oidc:3390/.well-known/openid-configuration",
-                "base_url", String.format("http://localhost:%d", Helpers.testServerPort()))),
-        Arguments.of(
-            "blank client_id",
-            ImmutableMap.of(
-                "idcs.client_id", "",
-                "idcs.secret", "bar",
-                "idcs.discovery_uri", "http://dev-oidc:3390/.well-known/openid-configuration",
-                "base_url", String.format("http://localhost:%d", Helpers.testServerPort()))),
-        Arguments.of(
-            "blank secret",
-            ImmutableMap.of(
-                "idcs.client_id", "foo",
-                "idcs.secret", "bar",
-                "idcs.discovery_uri", "http://dev-oidc:3390/.well-known/openid-configuration",
-                "base_url", String.format("http://localhost:%d", Helpers.testServerPort()))),
-        Arguments.of(
-            "missing secret",
-            ImmutableMap.of(
-                "idcs.client_id", "foo",
-                "idcs.discovery_uri", "http://dev-oidc:3390/.well-known/openid-configuration",
-                "base_url", String.format("http://localhost:%d", Helpers.testServerPort()))),
-        Arguments.of(
-            "missing base_url",
-            ImmutableMap.of(
-                "idcs.client_id", "foo",
-                "idcs.secret", "bar",
-                "idcs.discovery_uri", "http://dev-oidc:3390/.well-known/openid-configuration")),
-        Arguments.of(
-            "blank discovery uri",
-            ImmutableMap.of(
-                "idcs.client_id", "foo",
-                "idcs.secret", "bar",
-                "idcs.discovery_uri", "",
-                "base_url", String.format("http://localhost:%d", Helpers.testServerPort()))));
+  static ImmutableList<Object[]> provideConfigsForInvalidConfig() {
+    return ImmutableList.of(
+        new Object[] {
+          "blank client_id",
+          ImmutableMap.of(
+              "idcs.client_id",
+              "",
+              "idcs.secret",
+              "bar",
+              "idcs.discovery_uri",
+              discoveryUri,
+              "base_url",
+              baseUrl)
+        },
+        new Object[] {
+          "blank secret",
+          ImmutableMap.of(
+              "idcs.client_id",
+              "foo",
+              "idcs.secret",
+              "",
+              "idcs.discovery_uri",
+              discoveryUri,
+              "base_url",
+              baseUrl)
+        },
+        new Object[] {
+          "missing secret",
+          ImmutableMap.of(
+              "idcs.client_id", "foo",
+              "idcs.discovery_uri", discoveryUri,
+              "base_url", baseUrl)
+        },
+        new Object[] {
+          "missing base_url",
+          ImmutableMap.of(
+              "idcs.client_id", "foo",
+              "idcs.secret", "bar",
+              "idcs.discovery_uri", discoveryUri)
+        },
+        new Object[] {
+          "blank discovery uri",
+          ImmutableMap.of(
+              "idcs.client_id", "foo",
+              "idcs.secret", "bar",
+              "idcs.discovery_uri", "",
+              "base_url", baseUrl)
+        });
   }
 
-  @ParameterizedTest(name = "{index} {0} should throw exception")
-  @MethodSource("provideConfigsForInvalidConfig")
-  public void invalidConfig(String name, ImmutableMap<String, String> c) {
+  @Test
+  @TestCaseName("{index} {0} config get() should return null config")
+  @Parameters(method = "provideConfigsForInvalidConfig")
+  public void get_invalidConfig(String name, ImmutableMap<String, String> c) {
     Config empty_secret_config = ConfigFactory.parseMap(c);
 
     OidcProvider badOidcProvider =
@@ -193,11 +199,7 @@ public class OidcProviderTest extends ResetPostgres {
                 return userRepository;
               }
             });
-    try {
-      badOidcProvider.get();
-      fail("Should not have successfully gotten an imcomplete provider.");
-    } catch (RuntimeException e) {
-      // pass.
-    }
+    OidcClient client = badOidcProvider.get();
+    assertThat(client).isNull();
   }
 }
