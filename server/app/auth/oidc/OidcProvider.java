@@ -7,13 +7,14 @@ import java.util.Collections;
 
 import javax.inject.Provider;
 
-import com.google.inject.Inject;
 import com.typesafe.config.Config;
 
 import org.pac4j.core.http.callback.PathParameterCallbackUrlResolver;
 import org.pac4j.core.profile.creator.ProfileCreator;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import auth.ProfileFactory;
 import repository.UserRepository;
@@ -26,6 +27,7 @@ import repository.UserRepository;
  */
 public abstract class OidcProvider implements Provider<OidcClient> {
 
+  private static final Logger logger = LoggerFactory.getLogger(OidcProvider.class);
   protected final Config configuration;
   protected final ProfileFactory profileFactory;
   protected final Provider<UserRepository> applicantRepositoryProvider;
@@ -33,14 +35,13 @@ public abstract class OidcProvider implements Provider<OidcClient> {
 
   protected String[] defaultScopes = { "openid", "profile", "email" };
 
-  protected String providerNameConfigName = "provider_name";
-  protected String clientIDConfigName = "client_id";
-  protected String clientSecretConfigName = "client_secret";
-  protected String discoveryURIConfigName = "discovery_uri";
-  protected String responseModeConfigName = "response_mode";
-  protected String extraScopesConfigName = "additional_scopes";
+  private String providerNameConfigName = "provider_name";
+  private String clientIDConfigName = "client_id";
+  private String clientSecretConfigName = "client_secret";
+  private String discoveryURIConfigName = "discovery_uri";
+  private String responseModeConfigName = "response_mode";
+  private String extraScopesConfigName = "additional_scopes";
 
-  @Inject
   public OidcProvider(
       Config configuration,
       ProfileFactory profileFactory,
@@ -130,11 +131,18 @@ public abstract class OidcProvider implements Provider<OidcClient> {
     String responseType = getResponseType();
     String callbackURL = getCallbackURL();
     String providerName = getProviderName(); // optional
-
     if (clientID.isEmpty() || clientSecret.isEmpty() ||
         discoveryURI.isEmpty() || responseMode.isEmpty() ||
         responseType.isEmpty() || callbackURL.isEmpty()) {
-      return null;
+      logger.error("Missing Provider data:\n" +
+          "clientID=" + clientID + "\n" +
+          "clientSecret=" + clientSecret + "\n" +
+          "discoveryURI=" + discoveryURI + "\n" +
+          "responseMode=" + responseMode + "\n" +
+          "responseType=" + responseType + "\n" +
+          "callbackURL=" + callbackURL + "\n" +
+          "providerName=" + providerName);
+      throw new RuntimeException("Can't get OIDC client, data is missing");
     }
     OidcConfiguration config = new OidcConfiguration();
 

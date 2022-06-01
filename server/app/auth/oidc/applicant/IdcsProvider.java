@@ -49,7 +49,12 @@ public class IdcsProvider extends OidcProvider {
   };
 
   @Override
+  protected String getClientSecret() {
+    return getConfigurationValue(attributePrefix() + ".secret");
+  }
+
+  @Override
   public ProfileCreator getProfileAdapter(OidcConfiguration config, OidcClient client) {
-    return new IdcsProfileAdapter(config, client, configuration, profileFactory, applicantRepositoryProvider);
+    return new IdcsProfileAdapter(config, client, profileFactory, applicantRepositoryProvider);
   }
 }

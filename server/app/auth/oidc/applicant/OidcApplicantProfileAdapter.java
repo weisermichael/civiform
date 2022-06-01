@@ -1,10 +1,10 @@
 package auth.oidc.applicant;
 
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.inject.Provider;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.typesafe.config.Config;
 
@@ -12,8 +12,6 @@ import org.pac4j.core.credentials.Credentials;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.oidc.profile.OidcProfile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import auth.CiviFormProfile;
 import auth.CiviFormProfileData;
@@ -35,7 +33,6 @@ import repository.UserRepository;
  */
 public abstract class OidcApplicantProfileAdapter extends OidcProfileAdapter {
 
-  private static final Logger logger = LoggerFactory.getLogger(OidcApplicantProfileAdapter.class);
   protected final Config app_configuration;
 
   protected final String localeAttributeConfigName = "locale_attribute";
@@ -50,7 +47,7 @@ public abstract class OidcApplicantProfileAdapter extends OidcProfileAdapter {
       ProfileFactory profileFactory,
       Provider<UserRepository> applicantRepositoryProvider) {
     super(configuration, client, profileFactory, applicantRepositoryProvider);
-    this.app_configuration = Preconditions.checkNotNull(app_configuration);
+    this.app_configuration = app_configuration;
   }
 
   /*
@@ -91,10 +88,10 @@ public abstract class OidcApplicantProfileAdapter extends OidcProfileAdapter {
 
     String firstName = "", secondName = "";
     if (!firstNameAttributeName.isBlank()){
-      firstName = oidcProfile.getAttribute(firstNameAttributeName, String.class);
+      firstName = Objects.toString(oidcProfile.getAttribute(firstNameAttributeName, String.class), "");
     }
     if (!secondNameAttributeName.isBlank()){
-      secondName = oidcProfile.getAttribute(secondNameAttributeName, String.class);
+      secondName = Objects.toString(oidcProfile.getAttribute(secondNameAttributeName, String.class), "");
     }
     if (!firstName.isBlank() && !secondName.isBlank()) {
       return String.format("%s %s", firstName, secondName);
@@ -109,7 +106,7 @@ public abstract class OidcApplicantProfileAdapter extends OidcProfileAdapter {
     final String localeAttributeName = getLocaleAttributeName();
 
     if (!localeAttributeName.isBlank()) {
-      return oidcProfile.getAttribute(localeAttributeName, String.class);
+      return Objects.toString(oidcProfile.getAttribute(localeAttributeName, String.class), "");
     }
     return "";
   }
@@ -132,6 +129,7 @@ public abstract class OidcApplicantProfileAdapter extends OidcProfileAdapter {
     return profile.getAccount().join().getMemberOfGroup().isPresent();
   }
 
+  @Override
   protected ImmutableSet<Roles> roles(CiviFormProfile profile, OidcProfile oidcProfile) {
     if (isTrustedIntermediary(profile)) {
       return ImmutableSet.of(Roles.ROLE_APPLICANT, Roles.ROLE_TI);
@@ -150,6 +148,7 @@ public abstract class OidcApplicantProfileAdapter extends OidcProfileAdapter {
   }
 
   /** Merge the two provided profiles into a new CiviFormProfileData. */
+  @Override
   protected CiviFormProfileData mergeCiviFormProfile(
       CiviFormProfile civiformProfile, OidcProfile oidcProfile) {
     final String locale = getLocale(oidcProfile);

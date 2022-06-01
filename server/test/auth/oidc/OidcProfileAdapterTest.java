@@ -2,17 +2,20 @@ package auth.oidc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import auth.ProfileFactory;
-import auth.oidc.applicant.IdcsProfileAdapter;
+import java.util.Optional;
+
+import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
-import java.util.Optional;
-import javax.inject.Provider;
-import models.Account;
-import models.Applicant;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.pac4j.oidc.profile.OidcProfile;
+
+import auth.ProfileFactory;
+import auth.oidc.applicant.IdcsProfileAdapter;
+import models.Account;
+import models.Applicant;
 import repository.ResetPostgres;
 import repository.UserRepository;
 

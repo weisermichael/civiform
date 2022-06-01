@@ -23,6 +23,8 @@ import org.pac4j.play.http.PlayHttpActionAdapter;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * These routes can be hit even if you are logged in already, which is what allows the merge logic -
@@ -30,6 +32,7 @@ import play.mvc.Result;
  */
 public class LoginController extends Controller {
 
+  private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
   private final IndirectClient adminClient;
 
   private final IndirectClient applicantClient;
@@ -47,7 +50,7 @@ public class LoginController extends Controller {
       SessionStore sessionStore,
       Config config) {
     this.adminClient = adminClient;
-    this.applicantClient = applicantClient;
+    this.applicantClient = Preconditions.checkNotNull(applicantClient);
     this.sessionStore = Preconditions.checkNotNull(sessionStore);
     this.httpActionAdapter = PlayHttpActionAdapter.INSTANCE;
     this.config = config;
@@ -80,6 +83,7 @@ public class LoginController extends Controller {
     // technically
     // never happen.
     if (!isIDCS) {
+      logger.warn("Attempted to do IDCS registration with other provider");
       return login(request, applicantClient);
     }
 

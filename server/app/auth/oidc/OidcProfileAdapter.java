@@ -151,8 +151,6 @@ public abstract class OidcProfileAdapter extends OidcProfileCreator {
       return Optional.empty();
     }
 
-    logger.debug("oidcProfile: {}", oidcProfile.get());
-
     if (!(oidcProfile.get() instanceof OidcProfile)) {
       logger.warn(
           "Got a profile from OIDC callback but it wasn't an OIDC profile: %s",
