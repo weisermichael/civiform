@@ -38,7 +38,7 @@ function terraform::perform_destory() {
 #   TF_VAR_FILENAME
 #######################################
 function terraform::perform_apply() {
-  if [[ "${CIVIFORM_MODE}" == "dev" ]]; then
+  if [[ "${CIVIFORM_MODE}" == "dev" ]] || [[ "${CIVIFORM_MODE}" == "prober" ]]; then
     "${TERRAFORM_CMD[@]}" init -upgrade
   else
     "cloud/${CIVIFORM_CLOUD_PROVIDER}/bin/setup_tf_shared_state" \
