@@ -91,8 +91,12 @@ class ConfigLoader:
         civiform_mode = self.configs.get("CIVIFORM_MODE")
         return civiform_mode == "dev"
     
+    def is_test(self):
+        civiform_mode = self.configs.get("CIVIFORM_MODE")
+        return civiform_mode == "test"
+        
     def use_backend_config(self):
-        return not self.is_dev()
+        return not self.is_dev() and not self.is_test()
     
     def get_config_variables(self):
         return self.configs
