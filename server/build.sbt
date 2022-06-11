@@ -119,7 +119,10 @@ lazy val root = (project in file("."))
     Compile / doc / scalacOptions += "-no-link-warnings",
     // Turn off scaladoc
     Compile / packageDoc / publishArtifact := false,
-    Compile / doc / sources := Seq.empty
+    Compile / doc / sources := Seq.empty,
+
+    Compile / compile / logLevel := Level.Warn,
+    Test / logLevel := Level.Info
   )
   .settings(excludeTailwindGeneration: _*)
 
