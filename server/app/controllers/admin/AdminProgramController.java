@@ -103,6 +103,32 @@ public class AdminProgramController extends CiviFormController {
     return redirect(routes.AdminProgramController.index().url());
   }
 
+  /** POST endpoint for creating a COPY OF A program in the draft version. */
+  @Secure(authorizers = Authorizers.Labels.CIVIFORM_ADMIN)
+  public Result createCopy(Request request, 
+      String adminName,
+      String adminDescription,
+      String defaultDisplayName,
+      String defaultDisplayDescription,
+      String externalLink,
+      String displayMode) {
+    //Form<ProgramForm> programForm = formFactory.form(ProgramForm.class);
+    //ProgramForm program = programForm.bindFromRequest(request).get();
+    ErrorAnd<ProgramDefinition, CiviFormError> result =
+        service.createProgramDefinition(
+            adminName,
+            adminDescription,
+            defaultDisplayName,
+            defaultDisplayDescription,
+            externalLink,
+            displayMode);
+    if (result.isError()) {
+      System.out.println(joinErrors(result.getErrors()));
+      return ok(newOneView.render(request));
+    }
+    return redirect(routes.AdminProgramController.index().url());
+  }
+
   /** Return a HTML page containing a form to edit a draft program. */
   @Secure(authorizers = Authorizers.Labels.CIVIFORM_ADMIN)
   public Result edit(Request request, long id) {

@@ -202,6 +202,7 @@ public final class ProgramIndexView extends BaseHtmlView {
                 p().withClasses(Styles.FLEX_GROW),
                 maybeRenderManageTranslationsLink(draftProgram),
                 maybeRenderEditLink(draftProgram, activeProgram, request),
+                maybeRenderCopyButton(draftProgram, activeProgram, request),
                 maybeRenderViewApplicationsLink(activeProgram, profile),
                 renderManageProgramAdminsLink(draftProgram, activeProgram))
             .withClasses(Styles.FLEX, Styles.TEXT_SM, Styles.W_FULL);
@@ -273,6 +274,41 @@ public final class ProgramIndexView extends BaseHtmlView {
           .setStyles(Styles.MR_2)
           .asHiddenForm(request);
     } else {
+      // obsolete or deleted, no edit link, empty div.
+      return div();
+    }
+  }
+
+  Tag maybeRenderCopyButton(
+      Optional<ProgramDefinition> draftProgram,
+      Optional<ProgramDefinition> activeProgram,
+      Http.Request request) {
+    String copyProgramText = "Make Copy";
+    
+    //String link = controllers.admin.routes.AdminProgramController.newOne().url();
+
+    if (activeProgram.isPresent()) {
+      ProgramDefinition program = activeProgram.get();
+
+      String adminName = "Copy of " + program.adminName();
+      String adminDescription = program.adminDescription();
+      String defaultDisplayName = program.localizedName().getDefault();
+      String defaultDisplayDescription = program.localizedDescription().getDefault();
+      String externalLink = program.externalLink();
+      String displayMode = program.displayMode().getValue();
+
+      String copyProgramLink = controllers.admin.routes.AdminProgramController.createCopy(adminName, adminDescription, defaultDisplayName, defaultDisplayDescription, externalLink, displayMode).url();
+      return new LinkElement()
+          .setId("program-copy-link-" + activeProgram.get().id())
+          .setHref(copyProgramLink)
+          .setText(copyProgramText)
+          .setStyles(Styles.MR_2)
+          .asHiddenForm(request);
+    } 
+    else if (draftProgram.isPresent()) {
+      return div();
+    }
+    else {
       // obsolete or deleted, no edit link, empty div.
       return div();
     }

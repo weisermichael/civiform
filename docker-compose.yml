@@ -47,6 +47,7 @@ services:
       - "9000"
       - "8457"
     environment:
+      - USE_LOCAL_CIVIFORM=1
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-test}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-test}
       - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN:-test}
