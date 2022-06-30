@@ -16,7 +16,7 @@ GET     /admin/programs/new                                     controllers.admi
 GET     /admin/programs/:programId/edit                         controllers.admin.AdminProgramController.edit(request: Request, programId: Long)
 POST    /admin/programs/:programId/newVersion                   controllers.admin.AdminProgramController.newVersionFrom(request: Request, programId: Long)
 POST    /admin/programs                                         controllers.admin.AdminProgramController.create(request: Request)
-POST    /admin/programs/copy                                    controllers.admin.AdminProgramController.createCopy(request: Request, adminName: String, adminDescription: String, defaultDisplayName: String, defaultDisplayDescription: String, externalLink: String, displayMode: String)
+POST    /admin/programs/copy                                    controllers.admin.AdminProgramController.createCopy(request: Request, programId: Long, adminName: String, adminDescription: String, defaultDisplayName: String, defaultDisplayDescription: String, externalLink: String, displayMode: String)
 POST    /admin/programs/publish                                 controllers.admin.AdminProgramController.publish()
 POST    /admin/programs/:programId                              controllers.admin.AdminProgramController.update(request: Request, programId: Long)
 

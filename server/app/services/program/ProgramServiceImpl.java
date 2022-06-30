@@ -173,6 +173,7 @@ public class ProgramServiceImpl implements ProgramService {
     return ErrorAnd.of(programRepository.insertProgramSync(program).getProgramDefinition());
   }
 
+
   @Override
   public ErrorAnd<ProgramDefinition, CiviFormError> updateProgramDefinition(
       long programId,
@@ -643,7 +644,8 @@ public class ProgramServiceImpl implements ProgramService {
         .collect(ImmutableList.toImmutableList());
   }
 
-  private ProgramDefinition updateProgramDefinitionWithBlockDefinitions(
+  @Override
+  public ProgramDefinition updateProgramDefinitionWithBlockDefinitions(
       ProgramDefinition programDefinition, ImmutableList<BlockDefinition> blocks)
       throws IllegalPredicateOrderingException {
     ProgramDefinition program = programDefinition.toBuilder().setBlockDefinitions(blocks).build();

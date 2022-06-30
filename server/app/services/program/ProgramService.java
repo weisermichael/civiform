@@ -377,6 +377,9 @@ public interface ProgramService {
   /** Get all versions of the program with a version matching programId, including that one */
   ImmutableList<ProgramDefinition> getAllProgramDefinitionVersions(long programId);
 
+  ProgramDefinition updateProgramDefinitionWithBlockDefinitions(ProgramDefinition programDefinition, ImmutableList<BlockDefinition> blocks)
+      throws IllegalPredicateOrderingException;
+
   /** Get the names for active programs. */
   ImmutableSet<String> getActiveProgramNames();
 

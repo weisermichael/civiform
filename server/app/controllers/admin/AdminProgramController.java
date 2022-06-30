@@ -106,14 +106,14 @@ public class AdminProgramController extends CiviFormController {
   /** POST endpoint for creating a COPY OF A program in the draft version. */
   @Secure(authorizers = Authorizers.Labels.CIVIFORM_ADMIN)
   public Result createCopy(Request request, 
+      Long programId,
       String adminName,
       String adminDescription,
       String defaultDisplayName,
       String defaultDisplayDescription,
       String externalLink,
       String displayMode) {
-    //Form<ProgramForm> programForm = formFactory.form(ProgramForm.class);
-    //ProgramForm program = programForm.bindFromRequest(request).get();
+    
     ErrorAnd<ProgramDefinition, CiviFormError> result =
         service.createProgramDefinition(
             adminName,
@@ -122,10 +122,26 @@ public class AdminProgramController extends CiviFormController {
             defaultDisplayDescription,
             externalLink,
             displayMode);
+
     if (result.isError()) {
       System.out.println(joinErrors(result.getErrors()));
       return ok(newOneView.render(request));
     }
+
+    try {
+      service.updateProgramDefinitionWithBlockDefinitions(result.getResult(), service.getProgramDefinition(programId).blockDefinitions());
+      // ProgramDefinition program = result.getResult().toBuilder().setBlockDefinitions(service.getProgramDefinition(programId).blockDefinitions()).build();
+      // System.out.println(program);
+      //ImmutableList<BlockDefinition> blocks = service.getProgramDefinition(programId).blockDefinitions();
+      //ProgramDefinition.Builder builder = result.getResult().builder().setBlockDefinitions(program.blockDefinitions());
+      //System.out.println(program.blockDefinitions());
+    } 
+    catch (Exception e) {
+      return notFound(e.toString());
+    }
+    
+    //System.out.println(result.getResult());
+   // ProgramDefinition newProgram = result.getResult();
     return redirect(routes.AdminProgramController.index().url());
   }
 

@@ -148,6 +148,11 @@ public final class ProgramIndexView extends BaseHtmlView {
 
     ProgramDefinition displayProgram = getDisplayProgram(draftProgram, activeProgram);
 
+    System.out.println();
+    System.out.println(displayProgram);
+    System.out.println();
+    System.out.println(displayProgram.blockDefinitions());
+    System.out.println();
     String lastEditText =
         displayProgram.lastModifiedTime().isPresent()
             ? "Last updated: " + renderDateTime(displayProgram.lastModifiedTime().get(), zoneId)
@@ -285,10 +290,9 @@ public final class ProgramIndexView extends BaseHtmlView {
       Http.Request request) {
     String copyProgramText = "Make Copy";
     
-    //String link = controllers.admin.routes.AdminProgramController.newOne().url();
-
     if (activeProgram.isPresent()) {
       ProgramDefinition program = activeProgram.get();
+      //ImmutableList<BlockDefinition> blockDefs = program.blockDefinitions();
 
       String adminName = "Copy of " + program.adminName();
       String adminDescription = program.adminDescription();
@@ -296,8 +300,9 @@ public final class ProgramIndexView extends BaseHtmlView {
       String defaultDisplayDescription = program.localizedDescription().getDefault();
       String externalLink = program.externalLink();
       String displayMode = program.displayMode().getValue();
+      Long programId = program.id();
 
-      String copyProgramLink = controllers.admin.routes.AdminProgramController.createCopy(adminName, adminDescription, defaultDisplayName, defaultDisplayDescription, externalLink, displayMode).url();
+      String copyProgramLink = controllers.admin.routes.AdminProgramController.createCopy(programId, adminName, adminDescription, defaultDisplayName, defaultDisplayDescription, externalLink, displayMode).url();
       return new LinkElement()
           .setId("program-copy-link-" + activeProgram.get().id())
           .setHref(copyProgramLink)
